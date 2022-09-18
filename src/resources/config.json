@@ -1,0 +1,9 @@
+{
+	"secondary": true,
+	"pokemon": {
+		"swsh": {
+			"online": true,
+			"test": 1
+		}
+	}
+}
