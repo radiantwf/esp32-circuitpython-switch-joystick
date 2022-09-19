@@ -9,10 +9,15 @@ async def task_pokemon():
 
 
 def main():
-    print('准备中，15s后运行')
-    time.sleep(15)
-
+    print('准备中，5s后运行')
+    time.sleep(5)
     print('开始运行')
+
+    import device_info
+    print("剩余内存:{:.2f}KB".format(device_info.mem_free()))
+    rom = device_info.get_rom_info()
+    print("剩余存储空间:{:.2f}MB/{:.2f}MB".format(rom[0], rom[1]))
+
     loop = asyncio.get_event_loop()
     task1 = loop.create_task(task_pokemon())
     loop.run_until_complete(task1)

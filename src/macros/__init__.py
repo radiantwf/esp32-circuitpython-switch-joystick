@@ -9,6 +9,7 @@ async def run(name: str, cycle: bool = False):
     act = _get_action(name)
     if act == None:
         return
+
     while True:
         while True:
             ret = act.pop()
