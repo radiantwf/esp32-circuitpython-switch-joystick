@@ -18,9 +18,11 @@ async def on_udp_message(src_msg: str, addr):
             else:
                 c = src_msg[2:].split(":")
                 if len(c) == 2:
-                    await macros.create_task(c[0], c[1])
-                else:
-                    await macros.create_task(c[0])
+                    try:
+                        loop = int(c[1])
+                    except:
+                        loop = 1
+                await macros.create_task(c[0], loop)
                 ret_msg = "Done"
         elif cmd == "ram" or cmd == "mem":
             ret_msg = "剩余内存:{:.2f}KB".format(device_info.mem_free())

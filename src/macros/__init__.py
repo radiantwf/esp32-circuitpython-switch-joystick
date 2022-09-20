@@ -34,8 +34,8 @@ async def create_task(name: str, loop: int = 1):
 async def stop():
     global _running
     _running = False
-    tm = task_manager.TaskManager()
-    await tm.cancel_task(TASK_TAG)
+    # tm = task_manager.TaskManager()
+    # await tm.cancel_task(TASK_TAG)
 
 
 async def _run(name: str, loop: int = 1):

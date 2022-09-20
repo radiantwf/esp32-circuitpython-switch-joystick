@@ -37,7 +37,6 @@ class TaskManager(object):
 
     async def cancel_task(self, key: str):
         task = self._dic_tasks.get(key)
-        print(task)
         if task == None:
             return
         task.cancel()
