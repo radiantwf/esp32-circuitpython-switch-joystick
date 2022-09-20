@@ -1,4 +1,5 @@
-from macros import macro, config
+import customize.config as config
+from macros import macro
 
 
 class Action(object):
@@ -23,7 +24,7 @@ class Action(object):
 
         s1 = splits[1].split("?")
         if len(s1) == 2:
-            if self._config.check(s1[1]):
+            if self._config.macros_check(s1[1]):
                 times = 1
         else:
             s2 = splits[1].split("*")
@@ -84,7 +85,7 @@ class Action(object):
         self._current_node_link_cycle_times = 1
         self._waiting_node = []
 
-    def do_cycle(self):
+    def cycle_reset(self):
         self._current = self._body
         self._current_node_link_cycle_times = self._body_current_node_link_cycle_times
         self._waiting_node = []

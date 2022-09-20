@@ -16,11 +16,12 @@ class Macro(object):
             cls._instance = super(Macro, cls).__new__(cls)
         return cls._instance
 
+    _first = True
+
     def __init__(self):
-        self._dic_macros = self._get_macros()
-        # for key in self._dic_macros.keys():
-        #     print(key)
-        #     print(self._dic_macros[key])
+        if self._first:
+            self._first = False
+            self._dic_macros = self._get_macros()
 
     def get_node(self, macro_name: str) -> node.Node:
         try:
@@ -37,7 +38,7 @@ class Macro(object):
         dic_macros = dict()
         for key in dic_action_lines.keys():
             rows = dic_action_lines.get(key)
-            if rows!= None and len(rows) < 1:
+            if rows != None and len(rows) < 1:
                 continue
             action = None
             for row in dic_action_lines.get(key):

@@ -1,9 +1,30 @@
 {
-	"secondary": true,
-	"pokemon": {
-		"swsh": {
-			"online": true,
-			"test": 1
+	"wifi": {
+		"type": "ap",
+		"ssid": "esp32",
+		"pwd": "radiantwf"
+	},
+	"command": {
+		"macros": {
+			"swsh.regirock": "pokemon.swsh.regirock.regirock",
+			"swsh.restart": "pokemon.swsh.common.restart_game"
 		}
+	},
+	"macros": {
+		"autorun": {
+			"name": "swsh.regirock",
+			"loop": -1
+		},
+		"secondary": true,
+		"pokemon": {
+			"swsh": {
+				"online": true,
+				"test": 1
+			}
+		}
+	},
+	"udp": {
+		"listening_port": 5001,
+		"respond_port": 35001
 	}
 }
