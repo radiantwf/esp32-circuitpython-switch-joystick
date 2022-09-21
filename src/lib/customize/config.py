@@ -39,7 +39,7 @@ class Config(object):
                 ret[p] = v
         return ret
 
-    def set_macros_running_setting(self, key: str, value: bool):
+    def set_macros_running_setting(self, key: str, value):
         self._config["macros.running."+key] = value
 
     def macros_check(self, running_condition: str) -> bool:
@@ -53,6 +53,13 @@ class Config(object):
             if type(v) is bool:
                 return v
         return False
+
+    def macros_get(self, running_condition: str):
+        v = self.get("macros.running."+running_condition)
+        if v != None:
+            return v
+        v = self.get("macros."+running_condition)
+        return v
 
     def get(self, condition: str, type=""):
         if condition == None or condition == "":

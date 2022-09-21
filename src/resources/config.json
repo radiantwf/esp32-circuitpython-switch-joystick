@@ -1,12 +1,22 @@
 {
 	"wifi": {
-		"type": "ap",
-		"ssid": "esp32",
+		"type": "wifi",
+		"ssid": "WangFeng",
 		"pwd": "radiantwf"
 	},
 	"wifi1": {
 		"type": "wifi",
 		"ssid": "WangFeng",
+		"pwd": "radiantwf"
+	},
+	"wifi2": {
+		"type": "wifi",
+		"ssid": "NETGERR-JY",
+		"pwd": "19840618"
+	},
+	"wifi3": {
+		"type": "ap",
+		"ssid": "esp32",
 		"pwd": "radiantwf"
 	},
 	"command": {
@@ -16,10 +26,7 @@
 		}
 	},
 	"macros": {
-		"autorun": {
-			"name": "swsh.regirock",
-			"loop": -1
-		},
+		"autorun": "swsh.regirock:-1",
 		"secondary": true,
 		"pokemon": {
 			"swsh": {

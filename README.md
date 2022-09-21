@@ -28,19 +28,15 @@ A virtual HID USB joystick created using ESP32S2/S3
 
 2. ~~<font color=grey>实体按键支持（已废弃，计划采用WEB方式代替）</font>~~
 
-3. ~~<font color=grey>Web管理（脚本的启动、停止、参数配置）（已废弃，adafruit-circuitpython-httpserver库资源消耗过大）</font>~~
+3. Web管理（脚本的启动、停止、参数配置）
 
 4. 远程管理功能（首选HTTP服务，其次TCP/UDP或MQTT，尽量不依赖其他服务器或客户端软件，独自实现远程管理功能）
 
 ### 计划
 
-1. 宏录制
+1. 通过NS的HDMI输出连接PC端，实现简单图像识别，增强脚本功能
 
-2. UDP远程控制（增强控制，实时模拟操作等）
-
-3. 通过NS的HDMI输出连接PC端，实现简单图像识别，增强脚本功能
-
-4. **宝可梦朱紫脚本制作**
+2. **宝可梦朱紫脚本制作**
 
 ## 简介
 

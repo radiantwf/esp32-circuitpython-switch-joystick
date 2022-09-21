@@ -29,7 +29,10 @@ class Action(object):
         else:
             s2 = splits[1].split("*")
             try:
-                times = int(s2[1])
+                if s2[1].startswith("?"):
+                    times = int(self._config.macros_get(s2[1][1:]))
+                else:
+                    times = int(s2[1])
             except:
                 times = 1
         node = self._macro.get_node(key)

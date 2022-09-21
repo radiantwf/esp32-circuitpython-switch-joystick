@@ -14,13 +14,15 @@ def main():
     print("剩余内存:{:.2f}KB".format(device_info.mem_free()))
     rom = device_info.get_rom_info()
     print("剩余存储空间:{:.2f}MB/{:.2f}MB".format(rom[0], rom[1]))
+    macros.auto_run()
     tm = task_manager.TaskManager()
-    tm.create_task(macros.auto_run())
-
     udp = udp_server.UdpServer()
     udp.on_message = command.on_udp_message
 
     tm.create_task(udp.start_serve(), "udp")
+
+    import http_server as http
+    tm.create_task(http.serve(), "http")
 
     tm.wait_forever()
     tm.close_loop()
