@@ -5,9 +5,11 @@ A virtual HID USB joystick created using ESP32S3
 ## 硬件需求
 
 1. Switch主机 * 1
-
-2. ESP32S3/ESP32S2（需要有USB-OTG接口）开发板 * 1  （价格：38~70元，自行选购）
-
+2. ESP32S2/ESP32S3（需要有USB-OTG接口）开发板 * 1  （价格：12.5~70元，自行选购）
+   - 本人测试用设备：
+   - LOLIN S2 Mini：ESP32S2芯片，单核240MHz，N4R2    12.5元
+   - ESP32-S3-DevKitC-1-N16R8：ESP32S3芯片，双核240MHz，N16R8，支持蓝牙    59元
+   - 由于我希望降低大家的使用成本，后续的研发，测试，我将在LOLIN S2 Mini上进行
 3. USB线（连接主机与开发板） * 1
 
 <img src="imgs/devices.jpg" style="zoom: 25%;" />
@@ -34,7 +36,7 @@ A virtual HID USB joystick created using ESP32S3
 
 1. 宏录制
 
-2. Web服务接口（增强控制，实时模拟操作等）
+2. UDP远程控制（增强控制，实时模拟操作等）
 
 3. 通过NS的HDMI输出连接PC端，实现简单图像识别，增强脚本功能
 
@@ -46,9 +48,9 @@ A virtual HID USB joystick created using ESP32S3
 
 #### 固件编译
 
-1. EPS32S3 OTG口连接PC，Windows与Mac都可
+1. 设备OTG口连接PC，Windows与Mac都可
 
-2. 如果设备为EPS32S3-N16R8（16MB flash / 8MB psram），可直接使用项目中打包好固件，不需要自行编译
+2. 如果设备为 **EPS32S3-N16R8** 或 **LOLIN S2 Mini**，可直接使用**项目中打包好固件**，不需要自行编译，直接进行固件写入操作
 
 3. PC安装docker
 
@@ -91,23 +93,19 @@ A virtual HID USB joystick created using ESP32S3
 
 #### 固件写入
 
-1. Chrome浏览器打开[ESP Tool页面](https://espressif.github.io/esptool-js/)（<https://espressif.github.io/esptool-js/>）刷写固件
+1. Chrome浏览器打开[ESP Web Flasher 页面](https://nabucasa.github.io/esp-web-flasher/)（<https://nabucasa.github.io/esp-web-flasher/>）刷写固件
 
-2. ESP32进入固件写入模式
+2. ESP32进入固件写入模式（按住0或BOOT，点击RST，松开0或BOOT即可）
 
-3. 页面操作，连接设备，**Baudrate**选择**921600**
+3. 页面操作，连接设备，**Baudrate**选择**460800 (LOLIN S2 Mini)** / **921600 (ESP32S3N16R8)**
 
 4. 擦除设备，选择bin固件，同时把起始地址改为0x0，开始写入
 
-5. 写入完成后双击ESP32上RST按钮，或重新插拔设备即可
+5. 写入完成后双击设备上的RST按钮，或重新插拔设备即可
 
 #### 程序部署
 
-1. 修改src/boot.py文件，wifi用户名密码，如不使用wifi，wifi连接与时间同步代码即可
-
-   ```python
-   wifi.radio.connect("WangFeng", "radiantwf")
-   ```
+1. 修改src/resources/config.json中的wifi节点，type分为wifi和ap两种模式。
 
 2. 把工作目录src下所有文件目录，拷贝至ESP32S3被识别出盘符即可，相同文件目录覆盖
 

@@ -4,6 +4,11 @@
 		"ssid": "esp32",
 		"pwd": "radiantwf"
 	},
+	"wifi1": {
+		"type": "wifi",
+		"ssid": "WangFeng",
+		"pwd": "radiantwf"
+	},
 	"command": {
 		"macros": {
 			"swsh.regirock": "pokemon.swsh.regirock.regirock",
