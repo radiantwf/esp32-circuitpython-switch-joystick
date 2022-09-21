@@ -16,12 +16,13 @@ async def on_udp_message(src_msg: str, addr):
                 await macros.stop()
                 ret_msg = "Done"
             else:
+                loop = 1
                 c = src_msg[2:].split(":")
                 if len(c) == 2:
                     try:
                         loop = int(c[1])
                     except:
-                        loop = 1
+                        pass
                 await macros.create_task(c[0], loop)
                 ret_msg = "Done"
         elif cmd == "ram" or cmd == "mem":
