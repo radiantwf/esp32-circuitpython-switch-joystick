@@ -1,6 +1,6 @@
-# esp32s3-circuitpython-switch-joystick
+# esp32-circuitpython-switch-joystick
 
-A virtual HID USB joystick created using ESP32S3
+A virtual HID USB joystick created using ESP32S2/S3
 
 ## 硬件需求
 
