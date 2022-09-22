@@ -31,8 +31,11 @@ class TaskManager(object):
         self._loop.close()
 
     async def wait_task(self, task, key):
-        await task
-        print("{}任务完成".format(key))
+        try:
+            await task
+            print("{}任务完成".format(key))
+        except Exception as e:
+            print(e)
         self._dic_tasks.pop(key)
 
     async def cancel_task(self, key: str):

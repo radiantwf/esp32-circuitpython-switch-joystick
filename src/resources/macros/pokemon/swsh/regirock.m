@@ -1,5 +1,5 @@
 --雷吉洛克/雷吉斯奇鲁--
-<regirock>
+<regirock|雷吉洛克/雷吉斯奇鲁（定点）--secondary|副设备(副设备启动游戏时校验)|False>
 {
 	[common.wakeup_joystick]
 	[pokemon.swsh.common.restart_game]

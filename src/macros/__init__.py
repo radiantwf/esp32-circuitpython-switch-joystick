@@ -2,6 +2,7 @@ from macros import action
 import hid.joystick
 import time
 import asyncio
+import json
 import usb_hid
 import customize.config as config
 import customize.task_manager as task_manager
@@ -42,31 +43,41 @@ def result_info():
     global _result_info
     return _result_info
 
+def create_task(cmd: str):
+    try:
+        return _create_task_json(json.loads(cmd))
+    except:
+        global _result_info
+        _result_info = "启动命令{}有错误，请检查。".format(cmd)
+        return _result_info
+
 
 def auto_run():
     c = config.Config()
-    cmd = c.get("autorun", "macros")
-    create_task(cmd)
-
-
-def create_task(cmd: str):
-    c = config.Config()
-    paras = None
-    loop = 1
-    splits = cmd.split(":")
-    name = splits[0]
     try:
-        loop = int(splits[1])
-        paras = splits[2:]
+        _create_task_json(c.autorun)
     except:
-        pass
+        global _result_info
+        _result_info = "Config文件macro.autorun节点存在错误，无法启动脚本"
 
-    key = c.get("macros.{}".format(name), "command")
-    if key == None:
-        key = name
+
+def _create_task_json(cmd: dict):
+    c1 = cmd.get("name")
+    c2 = cmd.get("loop")
+    paras = cmd.get("paras")
+    if type(c1) is str:
+        name = c1
+    else:
+        raise
+    
+    if type(c2) is int:
+        loop = c2
+    else:
+        loop = -1
+
     tm = task_manager.TaskManager()
-    tm.create_task(_run(key, loop, paras), TASK_TAG)
-    return "{}：已添加任务。".format((key, loop, paras))
+    tm.create_task(_run(name, loop, paras), TASK_TAG)
+    return "{}：已添加任务。".format((name, loop, paras))
 
 
 def stop():
@@ -76,18 +87,12 @@ def stop():
     # await tm.cancel_task(TASK_TAG)
 
 
-async def _run(name: str, loop: int = 1, paras: list = None):
+async def _run(name: str, loop: int = 1, paras: dict = ()):
     msg = "开始运行{}脚本，循环次数：{}".format(name, loop)
     print(msg)
     times = 0
     if loop <= 0:
         loop = -1
-    if paras != None and len(paras) > 0:
-        c = config.Config()
-        for p in paras:
-            v = p.split("=")
-            if len(v) == 2:
-                c.set_macros_running_setting(v[0], v[1])
     global _running
     global _current_info
     global _result_info
@@ -95,8 +100,9 @@ async def _run(name: str, loop: int = 1, paras: list = None):
     start_ts = time.time()
     _start_time = start_ts
     try:
-        act = _get_action(name)
+        act = _get_action(name,paras)
         if act == None:
+            _result_info = "不存在名称为{}的脚本".format(name)
             return
         _running = True
         _result_info = ""
@@ -108,7 +114,8 @@ async def _run(name: str, loop: int = 1, paras: list = None):
                     raise asyncio.CancelledError
                 ret = act.pop()
                 # print(ret[0])
-                await joystick.do_action(ret[0])
+                if ret[0] != None:
+                    await joystick.do_action(ret[0])
                 if ret[1]:
                     break
             times += 1
@@ -135,8 +142,8 @@ async def _run(name: str, loop: int = 1, paras: list = None):
         _current_info = ""
 
 
-def _get_action(name: str) -> action.Action:
-    act = action.Action(name)
+def _get_action(name: str,paras:dict=dict()) -> action.Action:
+    act = action.Action(name,paras)
     if act._head == None:
         return None
     return act

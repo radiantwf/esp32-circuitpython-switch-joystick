@@ -13,6 +13,7 @@ class Config(object):
         if self._first:
             self._first = False
             self._config = dict()
+            self._autorun = None
             self._load_file()
 
     def _load_file(self):
@@ -34,32 +35,12 @@ class Config(object):
                 p = path + "." + key
             v = d.get(key)
             if type(v) is dict:
+                if p == "macros.autorun":
+                    self._autorun = v
                 ret = self._analyze_config(v, p, ret)
             else:
                 ret[p] = v
         return ret
-
-    def set_macros_running_setting(self, key: str, value):
-        self._config["macros.running."+key] = value
-
-    def macros_check(self, running_condition: str) -> bool:
-        if running_condition == None or running_condition == "":
-            return False
-        else:
-            v = self._config.get("macros.running."+running_condition)
-            if type(v) is bool:
-                return v
-            v = self._config.get("macros."+running_condition)
-            if type(v) is bool:
-                return v
-        return False
-
-    def macros_get(self, running_condition: str):
-        v = self.get("macros.running."+running_condition)
-        if v != None:
-            return v
-        v = self.get("macros."+running_condition)
-        return v
 
     def get(self, condition: str, type=""):
         if condition == None or condition == "":
@@ -74,4 +55,9 @@ class Config(object):
 
     def reset(self):
         self._config.clear()
+        self._autorun = None
         self._load_file()
+
+    @property
+    def autorun(self):
+        return self._autorun

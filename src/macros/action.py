@@ -1,12 +1,12 @@
-import customize.config as config
-from macros import macro
+from . import macro,paras
 
 
 class Action(object):
-    def __init__(self, macro_name: str):
+    def __init__(self, macro_name: str,in_paras:dict = dict()):
         self._macro = macro.Macro()
-        self._config = config.Config()
-        self._head = self._macro.get_node(macro_name)
+        n = self._macro.get_node(macro_name)
+        self._head = n[0]
+        self._paras = paras.Paras(n[1],in_paras)
         self._current = self._head
         self._current_node_link_cycle_times = 1
         self._waiting_node = []
@@ -21,21 +21,21 @@ class Action(object):
         splits = action_line.split("]")
         key = splits[0][1:]
         times = 0
-
         s1 = splits[1].split("?")
         if len(s1) == 2:
-            if self._config.macros_check(s1[1]):
+            if self._paras.get_bool(s1[1]):
                 times = 1
         else:
             s2 = splits[1].split("*")
             try:
                 if s2[1].startswith("?"):
-                    times = int(self._config.macros_get(s2[1][1:]))
+                    times = self._paras.get_int(s2[1][1:])
                 else:
                     times = int(s2[1])
             except:
                 times = 1
-        node = self._macro.get_node(key)
+        n = self._macro.get_node(key)
+        node = n[0]
         if node != None and times >= 1:
             self._waiting_node.append(
                 [self._current.next, self._current_node_link_cycle_times])

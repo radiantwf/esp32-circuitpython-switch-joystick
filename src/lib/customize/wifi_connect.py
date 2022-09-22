@@ -9,6 +9,7 @@ _wifi_type = _config.get("type", "wifi")
 print(_wifi_type)
 print(_ssid)
 print(_pwd)
+print(_hostname)
 
 
 def connect():

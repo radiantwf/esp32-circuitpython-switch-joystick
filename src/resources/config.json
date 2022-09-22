@@ -11,19 +11,17 @@
 		"pwd": "radiantwf",
 		"hostname": "ls2mini"
 	},
-	"command": {
-		"macros": {
-			"swsh.regirock": "pokemon.swsh.regirock.regirock",
-			"swsh.restart": "pokemon.swsh.common.restart_game"
+	"game": {
+		"pokemon": {
+			"swsh": "宝可梦剑/盾"
 		}
 	},
 	"macros": {
-		"autorun": "swsh.regirock:-1",
-		"secondary": true,
-		"pokemon": {
-			"swsh": {
-				"online": true,
-				"test": 1
+		"autorun": {
+			"name": "雷吉洛克/雷吉斯奇鲁（定点）",
+			"loop": -1,
+			"paras": {
+				"secondary": "True"
 			}
 		}
 	}

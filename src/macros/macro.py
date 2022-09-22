@@ -21,11 +21,17 @@ class Macro(object):
     def __init__(self):
         if self._first:
             self._first = False
+            self._publish = []
+            self._default_paras = dict()
             self._dic_macros = self._get_macros()
 
-    def get_node(self, macro_name: str) -> node.Node:
+    def get_node(self, name: str) -> node.Node:
         try:
-            return self._dic_macros.get(macro_name)
+            macro_name = name
+            for p in self._publish:
+                if p.get("summary") == name:
+                    macro_name = p.get("name")
+            return (self._dic_macros.get(macro_name),self._default_paras.get(macro_name))
         except:
             return None
 
@@ -99,7 +105,7 @@ class Macro(object):
                     if name != "":
                         dic[name] = rows
                     rows = []
-                name = file_tag + row[1:len(row)-1]
+                name = self._process_title(row[1:len(row) - 1],file_tag)
                 sub_rows = []
                 sub = False
                 continue
@@ -144,3 +150,32 @@ class Macro(object):
         if len(rows) > 0 and name != "":
             dic[name] = rows
         return dic
+
+    def _process_title(self, title_line:str,file_tag: str = "") -> str:
+        splits = title_line.split("--")
+        t1 = splits[0].split("|")
+        name = file_tag + t1[0]
+        summary = ""
+        paras = []
+        if (len(t1) >= 2 and t1[1] != ""):
+            summary = t1[1]
+        if len(splits) > 1:
+            dic_paras = dict()
+            for para in splits[1:]:
+                p2 = ""
+                v = ""
+                s = para.split("|")
+                p1 = s[0]
+                if len(s)>= 3:
+                    p2 = s[1]
+                    v = s[2]
+                elif len(s)==2:
+                    p2 =s[1]
+                paras.append(dict({"name":p1,"summary":p2,"default":v}))
+                dic_paras[p1] = v
+            self._default_paras[name] = dic_paras
+            
+        if summary != "":
+            self._publish.append(dict({"name":name,"summary":summary,"paras":paras}))
+        
+        return name
