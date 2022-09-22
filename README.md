@@ -19,6 +19,7 @@ A virtual HID USB joystick created using ESP32S2/S3
 1. 模拟NS手柄，控制NS主机
 2. 支持自定义宏脚本，实现游戏自动化
 3. 内部集成部分宝可梦剑盾功能的宏脚本
+4. HTTP WEB管理基本功能
 
 ## 预计追加功能
 

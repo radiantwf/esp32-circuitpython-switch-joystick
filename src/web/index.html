@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+	<title>ESP32手柄控制</title>
+	<script type="text/javascript" src="axios.min.js"></script>
+</head>
+<body>
+	<style type="text/css">
+		div {
+			padding: 15px;
+		}
+		div.no_padding {
+			padding: 0px;
+		}
+		div.div_status {
+			height: 150px;
+			white-space: pre-wrap;
+			border: 1px;
+			border-color: black;
+		}
+		div.macro {
+			display: flex;
+			float: right;
+			align-items: baseline;
+		}
+		a {
+			color: blue;
+			float: right;
+			padding-right: 5px;
+			font-size: 26px;
+		}
+		
+		a.a_macro_stop {
+			color: red;
+			font-size: 22px;
+		}
+		textarea {
+			font-size: 20px;
+			width: 100%;
+			height: 80px;
+			resize: none;
+			overflow: auto;
+		}
+		span {
+			width: 60px;
+		}
+	</style>
+	<h1 align="center">ESP32手柄控制</h1>
+	<div>
+		<div v-html="content" class="status_label div_status no_padding">
+		</div>
+		<br />
+		<a class="a_status" href="javascript:void(0)">刷新</a>
+		<br />
+	</div>
+
+	<div>
+		<h4 align="left">运行脚本控制</h1>
+		<textarea row=1 class="cmd"></textarea>
+		<br />
+		<div class="no_padding macro">
+			<a class="a_macro_stop" href="javascript:void(0)">停止所有脚本</a>
+			<span>&nbsp;</span>
+			<a class="a_macro_run" href="javascript:void(0)">运行</a>
+		</div>
+	</div>
+
+	<script>
+		setTimeout("get_device_status()", 100);
+		function get_device_status() {
+			axios.get("/status").then(function (resp) {
+				document.querySelector('.status_label').innerHTML = resp.data;
+			}, function (err) {
+				document.querySelector('.status_label').innerHTML = err;
+			});
+		}
+		document.querySelector('.a_status').onclick = get_device_status;
+		document.querySelector('.a_macro_stop').onclick = function () {
+			if (confirm("是否确定停止运行中脚本？")) {
+				axios.get("/macro/stop").then(function (resp) {
+					document.querySelector('.status_label').innerHTML = resp.data;
+					setTimeout("get_device_status()", 1000)
+				}, function (err) {
+					document.querySelector('.status_label').innerHTML = err;
+					setTimeout("get_device_status()", 1000)
+				});
+			}
+		}
+		document.querySelector('.a_macro_run').onclick = function () {
+			axios.post("/macro/start",document.querySelector('.cmd').value,{headers: {
+    "Content-Type": "text/plain"}}).then(function (resp) {
+				document.querySelector('.status_label').innerHTML = resp.data;
+				setTimeout("get_device_status()", 1000)
+			}, function (err) {
+				document.querySelector('.status_label').innerHTML = err;
+				setTimeout("get_device_status()", 1000)
+			});
+		}
+	</script>
+</body>
+
+</html>

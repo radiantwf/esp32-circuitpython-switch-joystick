@@ -15,6 +15,7 @@ _server = HTTPServer(_pool)
 async def serve():
     global _server
     HOST = str(wifi_connect.ip_address())
+    print(HOST)
     _server.start(HOST)
 
     while True:
@@ -26,20 +27,20 @@ async def serve():
 
 
 @_server.route("/ram", "GET")
-def base(request):
+def ram(request):
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body="剩余内存: {: .2f}KB".format(device_info.mem_free()))
 
 
 @_server.route("/rom", "GET")
-def base(request):
+def rom(request):
     rom = device_info.get_rom_info()
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body="剩余存储空间:{:.2f}MB/{:.2f}MB".format(rom[0], rom[1]))
 
 
 @_server.route("/status", "GET")
-def base(request):
+def status(request):
     txt = ""
     txt += "{}\n\n".format(macros.status_info())
     txt += "剩余内存: {: .2f}KB\n".format(device_info.mem_free())
@@ -50,28 +51,40 @@ def base(request):
 
 
 @_server.route("/macro/current", "GET")
-def base(request):
+def macro_current(request):
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body=macros.current_info())
 
 
 @_server.route("/macro/result", "GET")
-def base(request):
+def macro_result(request):
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body=macros.result_info())
 
 
 @_server.route("/macro/stop", "GET")
-def base(request):
+def macro_stop(request):
     macros.stop()
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body="Done")
 
 
 @_server.route("/macro/start", "POST")
-def base(request):
+def macro_start(request):
     raw_text = request.raw_request.decode("utf8")
     splits = raw_text.split("\n")
     cmd = splits[len(splits) - 1]
     ret = macros.create_task(cmd)
     return HTTPResponse(content_type="text/plain;charset=utf-8", body=ret)
+
+@_server.route("/")
+def index_root(request): 
+    return HTTPResponse(filename="/web/index.html")
+
+@_server.route("/index.html")
+def index(request): 
+    return HTTPResponse(filename="/web/index.html")
+
+@_server.route("/axios.min.js")
+def js1(request): 
+    return HTTPResponse(filename="/web/axios.min.js")

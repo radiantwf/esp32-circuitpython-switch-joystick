@@ -29,8 +29,11 @@ def status_info():
 def current_info():
     global _current_info
     global _start_time
+    global _running
     if _start_time == None or _start_time == 0:
         return "没有正在执行的脚本"
+    if not _running :
+        return "已收到中止指令，正在处理中"
     span = int(time.time() - _start_time)
     return _current_info + "持续运行时间：{:.0f}小时{:.0f}分{:.0f}秒".format(span/3600, (span % 3600)/60, span % 60)
 

@@ -2,12 +2,14 @@
 	"wifi": {
 		"type": "ap",
 		"ssid": "esp32",
-		"pwd": "radiantwf"
+		"pwd": "radiantwf",
+		"hostname": "ls2mini"
 	},
 	"wifi1": {
 		"type": "wifi",
 		"ssid": "WangFeng",
-		"pwd": "radiantwf"
+		"pwd": "radiantwf",
+		"hostname": "ls2mini"
 	},
 	"command": {
 		"macros": {
