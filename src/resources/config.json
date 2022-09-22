@@ -1,22 +1,12 @@
 {
 	"wifi": {
-		"type": "wifi",
-		"ssid": "WangFeng",
+		"type": "ap",
+		"ssid": "esp32",
 		"pwd": "radiantwf"
 	},
 	"wifi1": {
 		"type": "wifi",
 		"ssid": "WangFeng",
-		"pwd": "radiantwf"
-	},
-	"wifi2": {
-		"type": "wifi",
-		"ssid": "NETGERR-JY",
-		"pwd": "19840618"
-	},
-	"wifi3": {
-		"type": "ap",
-		"ssid": "esp32",
 		"pwd": "radiantwf"
 	},
 	"command": {
@@ -34,9 +24,5 @@
 				"test": 1
 			}
 		}
-	},
-	"udp": {
-		"listening_port": 5001,
-		"respond_port": 35001
 	}
 }

@@ -5,7 +5,6 @@ import asyncio
 import usb_hid
 import customize.config as config
 import customize.task_manager as task_manager
-import customize.udp_server as udp_server
 
 joystick = hid.joystick.JoyStick(usb_hid.devices)
 
@@ -75,9 +74,7 @@ def stop():
 
 
 async def _run(name: str, loop: int = 1, paras: list = None):
-    udp = udp_server.UdpServer()
     msg = "开始运行{}脚本，循环次数：{}".format(name, loop)
-    udp.broadcast_message(msg)
     print(msg)
     times = 0
     if loop <= 0:
@@ -118,7 +115,6 @@ async def _run(name: str, loop: int = 1, paras: list = None):
                 break
             act.cycle_reset()
         msg = "脚本{}运行完成，当前运行次数：{}".format(name, times)
-        udp.broadcast_message(msg)
         print(msg)
         span = time.time() - start_ts
         _result_info = "脚本[{}]运行完成，实际运行{}次\n持续运行时间：{:.0f}小时{:.0f}分{:.0f}秒".format(
@@ -126,7 +122,6 @@ async def _run(name: str, loop: int = 1, paras: list = None):
     except asyncio.CancelledError:
         joystick.release()
         msg = "脚本{}运行中止，当前运行次数：{}".format(name, times)
-        udp.broadcast_message(msg)
         print(msg)
         span = time.time() - start_ts
         _result_info = "脚本[{}]运行中断，实际运行{}次，计划运行{}次\n持续运行时间：{:.0f}小时{:.0f}分{:.0f}秒".format(
