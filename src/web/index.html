@@ -177,7 +177,8 @@
 					}
 					display_select_option_elements();
 				},
-				error: function (err) {
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('.status_label').text(thrownError.message);
 					setTimeout("get_macros()", 1000);
 				}
 			});
@@ -232,15 +233,20 @@
 				success: function (result) {
 					$('.status_label').text(result);
 				},
-				error: function (err) {
-					$('.status_label').text(err);
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('.status_label').text(thrownError.message);
 				}
 			});
+		}
+		function get_device_status_loop() {
+			get_device_status();
+			setTimeout("get_device_status_loop()", 10000);
 		}
 		var macros = {};
 		init();
 		get_macros();
-		setTimeout("get_device_status()", 100);
+
+		setTimeout("get_device_status_loop()", 100);
 		$('.a_status').click(get_device_status);
 		$('.a_macro_stop').click(function () {
 			if (confirm("是否确定停止运行中脚本？")) {
@@ -251,15 +257,12 @@
 						$('.status_label').text(result);
 						setTimeout("get_device_status()", 1000);
 					},
-					error: function (err) {
-						$('.status_label').text(err);
+					error: function (xhr, ajaxOptions, thrownError) {
+						$('.status_label').text(thrownError.message);
 						setTimeout("get_device_status()", 1000);
 					}
 				});
 			}
-
-
-
 		});
 		$('.a_macro_run').click(function () {
 			var data = {};
@@ -280,15 +283,14 @@
 			$.ajax({
 				type: "POST",
 				url: "/macro/start",
-				contentType: "application/json;charset=utf-8", 
-				dataType: "json",
-				data: JSON.stringify(data), 
+				contentType: "application/json;charset=utf-8",
+				data: JSON.stringify(data),
 				success: function (result) {
 					$('.status_label').text(result);
 					setTimeout("get_device_status()", 1000);
 				},
-				error: function (err) {
-					$('.status_label').text(err);
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('.status_label').text(thrownError.message);
 					setTimeout("get_device_status()", 1000);
 				}
 			});
