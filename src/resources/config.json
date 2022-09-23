@@ -19,5 +19,8 @@
 				"secondary": "True"
 			}
 		}
+	},
+	"web-server": {
+		"running":false
 	}
 }

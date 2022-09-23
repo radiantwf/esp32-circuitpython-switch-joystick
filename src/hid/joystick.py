@@ -168,12 +168,17 @@ class JoyStick:
         if keep < 0:
             keep = 0.005
         start = time.monotonic()
+        wish_end = start + keep
         while True:
             self._send(input_line)
             last = time.monotonic()
             for i in range(0,1000):
                 now = time.monotonic()
-                if now - start > keep and now - last > 0.005:
+                left = wish_end - now
+                if left > 1.1:
+                    await asyncio.sleep(1)
+                    break
+                if left <= 0 and now - last > 0.005:
                     self.release()
                     return
                 await asyncio.sleep_ms(1)
