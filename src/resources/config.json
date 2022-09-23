@@ -11,11 +11,6 @@
 		"pwd": "radiantwf",
 		"hostname": "ls2mini"
 	},
-	"game": {
-		"pokemon": {
-			"swsh": "宝可梦剑/盾"
-		}
-	},
 	"macros": {
 		"autorun": {
 			"name": "雷吉洛克/雷吉斯奇鲁（定点）",

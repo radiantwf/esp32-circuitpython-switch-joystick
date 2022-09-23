@@ -156,9 +156,17 @@ class Macro(object):
         t1 = splits[0].split("|")
         name = file_tag + t1[0]
         summary = ""
+        loop = -1
         paras = []
-        if (len(t1) >= 2 and t1[1] != ""):
-            summary = t1[1]
+        if t1[0] != "":
+            if len(t1) >= 3:
+                summary = t1[1]
+                try:
+                    loop = int(float(t1[2]))
+                except:
+                    pass
+            elif len(t1) == 2:
+                summary = t1[1]
         if len(splits) > 1:
             dic_paras = dict()
             for para in splits[1:]:
@@ -176,6 +184,6 @@ class Macro(object):
             self._default_paras[name] = dic_paras
             
         if summary != "":
-            self._publish.append(dict({"name":name,"summary":summary,"paras":paras}))
+            self._publish.append(dict({"name":name,"summary":summary,"loop":loop,"paras":paras}))
         
         return name

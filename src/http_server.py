@@ -68,6 +68,11 @@ def macro_stop(request):
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body="Done")
 
+@_server.route("/macro/published", "GET")
+def marcos(request):
+    return HTTPResponse(content_type="text/plain;charset=utf-8",
+                        body=macros.published())
+
 
 @_server.route("/macro/start", "POST")
 def macro_start(request):
@@ -85,6 +90,6 @@ def index_root(request):
 def index(request): 
     return HTTPResponse(filename="/web/index.html")
 
-@_server.route("/axios.min.js")
+@_server.route("/jquery-3.6.1.min.js")
 def js1(request): 
-    return HTTPResponse(filename="/web/axios.min.js")
+    return HTTPResponse(filename="/web/jquery-3.6.1.min.js")

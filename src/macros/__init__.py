@@ -1,4 +1,4 @@
-from macros import action
+from macros import action,macro
 import hid.joystick
 import time
 import asyncio
@@ -86,6 +86,13 @@ def stop():
     # tm = task_manager.TaskManager()
     # await tm.cancel_task(TASK_TAG)
 
+def published():
+    m= macro.Macro()
+    if m._publish!= None:
+        return json.dumps(m._publish)
+    else:
+        return ""
+    
 
 async def _run(name: str, loop: int = 1, paras: dict = ()):
     msg = "开始运行{}脚本，循环次数：{}".format(name, loop)
@@ -134,7 +141,7 @@ async def _run(name: str, loop: int = 1, paras: dict = ()):
         msg = "脚本{}运行中止，当前运行次数：{}".format(name, times)
         print(msg)
         span = time.time() - start_ts
-        _result_info = "脚本[{}]运行中断，实际运行{}次，计划运行{}次\n持续运行时间：{:.0f}小时{:.0f}分{:.0f}秒".format(
+        _result_info = "脚本[{}]停止，实际运行{}次，计划运行{}次\n持续运行时间：{:.0f}小时{:.0f}分{:.0f}秒".format(
             name, times, loop, span/3600, (span % 3600)/60, span % 60)
     finally:
         _start_time = None

@@ -265,9 +265,9 @@ body: : 标记重复运行时循环起始位置，body:标记前一般为前置�
 
 ## 远程管理
 
-采用UDP方式进行管理，监听端口与回复端口通过config文件配置（临时）
+采用HTTP方式进行管理
 
-<img src="imgs/udp.jpg"/>
+<img src="imgs/http.png"/>
 
 ### 运行效果
 
