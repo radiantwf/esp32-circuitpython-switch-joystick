@@ -164,16 +164,16 @@ class JoyStick:
     def release(self):
         self._send("")
 
-    async def key_press(self,  input_line: str = "", keep: float = 0.01):
+    async def key_press(self,  input_line: str = "", keep: float = 0.005):
         if keep < 0:
-            keep = 0.01
+            keep = 0.005
         start = time.monotonic()
         while True:
             self._send(input_line)
             last = time.monotonic()
             for i in range(0,1000):
                 now = time.monotonic()
-                if now - start > keep and now - last > 0.01:
+                if now - start > keep and now - last > 0.005:
                     self.release()
                     return
                 await asyncio.sleep_ms(1)
