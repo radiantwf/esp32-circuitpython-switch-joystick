@@ -146,11 +146,14 @@ class JoyStickInput:
     def buffer(self):
         return self._buffer
 
+_Mini_Key_Send_Span_ns = 1000000
+_Mini_Key_Send_Span_check_delay = float(100000 / 1000000000)
 
 class JoyStick:
     def __init__(self, devices):
         self._joystick_device = find_device(
             devices, usage_page=0x1, usage=0x05)
+        self._mini_next_send_monotonic_ns = 0
         try:
             self.release()
         except OSError:
@@ -159,29 +162,25 @@ class JoyStick:
 
     def _send(self,  input_line: str = ""):
         input = JoyStickInput(input_line)
+        while time.monotonic_ns() < self._mini_next_send_monotonic_ns:
+            time.sleep(_Mini_Key_Send_Span_check_delay)
         self._joystick_device.send_report(input.buffer())
+        self._mini_next_send_monotonic_ns = time.monotonic_ns() + _Mini_Key_Send_Span_ns
 
     def release(self):
         self._send("")
 
     async def key_press(self,  input_line: str = "", keep: float = 0.005):
+        keep *=  1000000000
         if keep < 0:
-            keep = 0.005
-        start = time.monotonic()
-        wish_end = start + keep
-        while True:
-            self._send(input_line)
-            last = time.monotonic()
-            for i in range(0,1000):
-                now = time.monotonic()
-                left = wish_end - now
-                if left > 1.1:
-                    await asyncio.sleep(1)
-                    break
-                if left <= 0 and now - last > 0.005:
-                    self.release()
-                    return
-                await asyncio.sleep_ms(1)
+            keep = _Mini_Key_Send_Span_ns
+        self._send(input_line)
+        start = time.monotonic_ns()
+        wish_end = start + keep - 1000000
+        # 因为每次延时1ms，提前1ms跳出循环
+        while time.monotonic_ns() <= wish_end:
+            await asyncio.sleep_ms(1)
+        self.release()
 
     async def do_action(self,  action_line: str = ""):
         splits = action_line.split(":")

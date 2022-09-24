@@ -26,6 +26,11 @@ async def serve():
             continue
 
 
+@_server.route("/cpu", "GET")
+def ram(request):
+    return HTTPResponse(content_type="text/plain;charset=utf-8",
+                        body="CPU温度: {: .2f}".format(device_info.cpu_temperature()))
+
 @_server.route("/ram", "GET")
 def ram(request):
     return HTTPResponse(content_type="text/plain;charset=utf-8",
@@ -43,6 +48,7 @@ def rom(request):
 def status(request):
     txt = ""
     txt += "{}\n\n".format(macros.status_info())
+    txt += "CPU温度: {: .2f}\n".format(device_info.cpu_temperature())
     txt += "剩余内存: {: .2f}KB\n".format(device_info.mem_free())
     rom = device_info.get_rom_info()
     txt += "剩余存储空间:{:.2f}MB/{:.2f}MB\n".format(rom[0], rom[1])

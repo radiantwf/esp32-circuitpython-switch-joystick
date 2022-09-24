@@ -10,3 +10,7 @@ def mem_free():
     import gc
     m = gc.mem_free() / 1024
     return m
+
+def cpu_temperature():
+    import microcontroller
+    return microcontroller.cpu.temperature
