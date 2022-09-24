@@ -1,191 +1,50 @@
 import time
 from adafruit_hid import find_device
+from hid import joystick_input
 import asyncio
 
-_Input0_Y = 0b1
-_Input0_B = 0b10
-_Input0_A = 0b100
-_Input0_X = 0b1000
-_Input0_L = 0b10000
-_Input0_R = 0b100000
-_Input0_ZL = 0b1000000
-_Input0_ZR = 0b10000000
 
-_Input1_Minus = 0b1
-_Input1_Plus = 0b10
-_Input1_LPress = 0b100
-_Input1_RPress = 0b1000
-_Input1_Home = 0b10000
-_Input1_Capture = 0b100000
-
-_Input2_DPadTop = 0
-_Input2_DPadTopRight = 1
-_Input2_DPadRight = 2
-_Input2_DPadBottomRight = 3
-_Input2_DPadBottom = 4
-_Input2_DPadBottomLeft = 5
-_Input2_DPadLeft = 6
-_Input2_DPadTopLeft = 7
-_Input2_DPadCenter = 8
-
-
-class JoyStickInput:
-    def __init__(self, input_line):
-        self._buffer = bytearray(8)
-        self._buffer[2] = _Input2_DPadCenter
-        self._buffer[3] = 128
-        self._buffer[4] = 128
-        self._buffer[5] = 128
-        self._buffer[6] = 128
-
-        splits = input_line.upper().split("|", -1)
-        for s in splits:
-            s = s.strip()
-            if s == "Y":
-                self._buffer[0] |= _Input0_Y
-            elif s == "B":
-                self._buffer[0] |= _Input0_B
-            elif s == "X":
-                self._buffer[0] |= _Input0_X
-            elif s == "A":
-                self._buffer[0] |= _Input0_A
-            elif s == "L":
-                self._buffer[0] |= _Input0_L
-            elif s == "R":
-                self._buffer[0] |= _Input0_R
-            elif s == "ZL":
-                self._buffer[0] |= _Input0_ZL
-            elif s == "ZR":
-                self._buffer[0] |= _Input0_ZR
-            elif s == "MINUS":
-                self._buffer[1] |= _Input1_Minus
-            elif s == "PLUS":
-                self._buffer[1] |= _Input1_Plus
-            elif s == "LPRESS":
-                self._buffer[1] |= _Input1_LPress
-            elif s == "RPRESS":
-                self._buffer[1] |= _Input1_RPress
-            elif s == "HOME":
-                self._buffer[1] |= _Input1_Home
-            elif s == "CAPTURE":
-                self._buffer[1] |= _Input1_Capture
-            elif s == "CENTER":
-                self._buffer[2] = _Input2_DPadCenter
-            elif s == "TOP":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadTop
-            elif s == "TOPRIGHT":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadTopRight
-            elif s == "RIGHT":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadRight
-            elif s == "BOTTOMRIGHT":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadBottomRight
-            elif s == "BOTTOM":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadBottom
-            elif s == "BOTTOMLEFT":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadBottomLeft
-            elif s == "LEFT":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadLeft
-            elif s == "TOPLEFT":
-                if self._buffer[2] != _Input2_DPadCenter:
-                    self._buffer[2] = _Input2_DPadCenter
-                else:
-                    self._buffer[2] = _Input2_DPadTopLeft
-            else:
-                stick = s.split("@", -1)
-                if len(stick) == 2:
-                    x = 0
-                    y = 0
-                    coordinate = stick[1].split(",", -1)
-                    if len(coordinate) == 2:
-                        x = self._coordinate_str_convert_int(coordinate[0])
-                        y = self._coordinate_str_convert_int(coordinate[1])
-                    x += 128
-                    y += 128
-                    if stick[0] == "LSTICK":
-                        if self._buffer[3] == 128 and self._buffer[4] == 128:
-                            self._buffer[3] = x
-                            self._buffer[4] = y
-                    elif stick[0] == "RSTICK":
-                        if self._buffer[5] == 128 and self._buffer[6] == 128:
-                            self._buffer[5] = x
-                            self._buffer[6] = y
-
-    def _coordinate_str_convert_int(self, str):
-        v = 0
-        try:
-            v = int(float(str))
-        except:
-            pass
-        if v < -128:
-            v = -128
-        elif v > 127:
-            v = 127
-        return v
-
-    def buffer(self):
-        return self._buffer
-
-_Mini_Key_Send_Span_ns = 1000000
-_Mini_Key_Send_Span_check_delay = float(100000 / 1000000000)
+_Mini_Key_Send_Span_ns = 2000000
 
 class JoyStick:
     def __init__(self, devices):
         self._joystick_device = find_device(
             devices, usage_page=0x1, usage=0x05)
-        self._mini_next_send_monotonic_ns = 0
+        self._last_send_monotonic_ns = 0
         try:
-            self.release()
+            self._sync_release()
         except OSError:
             time.sleep(1)
-            self.release()
+            self._sync_release()
 
-    def _send(self,  input_line: str = ""):
-        input = JoyStickInput(input_line)
-        while time.monotonic_ns() < self._mini_next_send_monotonic_ns:
-            time.sleep(_Mini_Key_Send_Span_check_delay)
+    def _sync_release(self):
+        self._sync_send(joystick_input.JoyStickInput(""))
+
+    def _sync_send(self,input:joystick_input.JoyStickInput):
         self._joystick_device.send_report(input.buffer())
-        self._mini_next_send_monotonic_ns = time.monotonic_ns() + _Mini_Key_Send_Span_ns
+        self._last_send_monotonic_ns = time.monotonic_ns()
 
-    def release(self):
-        self._send("")
+
+    async def _send(self,  input_line: str = ""):
+        earliest = self._last_send_monotonic_ns + _Mini_Key_Send_Span_ns
+        input = joystick_input.JoyStickInput(input_line)
+        now = time.monotonic_ns()
+        if now < earliest:
+            await asyncio.sleep_ms((earliest - now)/1000000)
+        self._sync_send(input)
+
+    async def release(self):
+        await self._send("")
 
     async def key_press(self,  input_line: str = "", keep: float = 0.005):
-        keep *=  1000000000
-        if keep < 0:
-            keep = _Mini_Key_Send_Span_ns
-        self._send(input_line)
-        start = time.monotonic_ns()
-        wish_end = start + keep - 1000000
-        # 因为每次延时1ms，提前1ms跳出循环
-        while time.monotonic_ns() <= wish_end:
-            await asyncio.sleep_ms(1)
-        self.release()
+        await self._send(input_line)
+        await asyncio.sleep(keep)
+        await self.release()
 
     async def do_action(self,  action_line: str = ""):
         splits = action_line.split(":")
         if len(splits) > 2:
-            self.release()
+            await self.release()
             return
         if len(splits) == 1:
             try:

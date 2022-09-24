@@ -137,7 +137,7 @@ async def _run(name: str, loop: int = 1, paras: dict = ()):
         _result_info = "脚本[{}]运行完成，实际运行{}次\n持续运行时间：{:.0f}小时{:.0f}分{:.0f}秒".format(
             name, times, span/3600, (span % 3600)/60, span % 60)
     except asyncio.CancelledError:
-        joystick.release()
+        await joystick.release()
         msg = "脚本{}运行中止，当前运行次数：{}".format(name, times)
         print(msg)
         span = time.time() - start_ts
