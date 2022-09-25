@@ -4,7 +4,7 @@ from hid import joystick_input
 import asyncio
 
 
-_Mini_Key_Send_Span_ns = 2000000
+_Mini_Key_Send_Span_ns = 3000000
 
 class JoyStick:
     def __init__(self, devices):

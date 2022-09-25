@@ -21,6 +21,6 @@
 		}
 	},
 	"web-server": {
-		"running":true
+		"running":false
 	}
 }
