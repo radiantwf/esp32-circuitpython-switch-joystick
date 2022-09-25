@@ -28,9 +28,17 @@ class JoyStick:
     async def _send(self,  input_line: str = ""):
         earliest = self._last_send_monotonic_ns + _Mini_Key_Send_Span_ns
         input = joystick_input.JoyStickInput(input_line)
-        now = time.monotonic_ns()
-        if now < earliest:
-            await asyncio.sleep_ms((earliest - now)/1000000)
+        while True:
+            now = time.monotonic_ns()
+            if now < earliest:
+                ns = int((earliest - now)/1000000)
+                if ns > 0:
+                    await asyncio.sleep_ms(ns)
+                else:
+                    time.sleep(float((earliest - now)%1000000000)/1000000000)
+                    break
+            else:
+                break
         self._sync_send(input)
 
     async def release(self):
