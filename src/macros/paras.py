@@ -1,6 +1,3 @@
-
-
-
 class Paras(object):
     def __init__(self, default_para: dict,para:dict):
         self._paras = None
@@ -16,18 +13,32 @@ class Paras(object):
                     self._paras[key] = v
 
     def get_bool(self,key)->bool:
-        v = self._paras.get(key)
-        if v == None and not (type(v) is str):
+        locals().update(self._paras)
+        try:
+            v = eval(key)
+        except:
             return False
-        elif v.lower() == "true":
+        if v == None:
+            return False
+        elif (type(v) is bool):
+            return v
+        elif (type(v) is str) and v.lower() == "true":
             return True
         return False
     
     def get_int(self,key)->int:
-        v = self._paras.get(key)
-        if v == None and not (type(v) is str):
-            return 1
+        locals().update(self._paras)
         try:
-            return int(float(v))
+            v = eval(key)
         except:
-            return 1
+            return 0
+
+        if v == None:
+            return 0
+        elif (type(v) is int):
+            return v
+        elif (type(v) is float):
+            return int(v)
+        elif (type(v) is str):
+            int(float(v))
+        return 0

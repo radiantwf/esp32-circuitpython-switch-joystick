@@ -1,2 +1,2 @@
 #!/bin/bash
-pip3 install circup
+pip3 install --upgrade circup

@@ -8,7 +8,7 @@ random.seed(time.time())
 _S_IFDIR = const(16384)
 _MACRO_BASE_PATH = "/resources/macros"
 _MACRO_EXT = ".m"
-
+_FINISHED_LINE = "0000000"
 
 class Macro(object):
     def __new__(cls, *args, **kwargs):
@@ -103,6 +103,7 @@ class Macro(object):
             if row.startswith("<") and row.endswith(">"):
                 if len(rows) > 0:
                     if name != "":
+                        rows.append(_FINISHED_LINE)
                         dic[name] = rows
                     rows = []
                 name = self._process_title(row[1:len(row) - 1],file_tag)
@@ -148,6 +149,7 @@ class Macro(object):
             else:
                 rows.append(row)
         if len(rows) > 0 and name != "":
+            rows.append(_FINISHED_LINE)
             dic[name] = rows
         return dic
 

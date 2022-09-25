@@ -28,24 +28,24 @@ class Action(object):
         else:
             s2 = splits[1].split("*")
             try:
-                if s2[1].startswith("?"):
-                    times = self._paras.get_int(s2[1][1:])
-                else:
-                    times = int(s2[1])
+                times = self._paras.get_int(s2[1])
             except:
                 times = 1
         n = self._macro.get_node(key)
         node = n[0]
-        if node != None and times >= 1:
+        if node.action != macro._FINISHED_LINE and times >= 1:
             self._waiting_node.append(
                 [self._current.next, self._current_node_link_cycle_times])
             self._current = node
             self._current_node_link_cycle_times = times
             return True
+        elif self._current != macro._FINISHED_LINE and times < 1:
+            self._current = self._current.next
+            return True
         return False
 
     def _return_jump(self):
-        if self._current != None:
+        if self._current.action != macro._FINISHED_LINE:
             return
         if self._current_node_link_cycle_times > 1:
             self._current = self._current.head
@@ -55,32 +55,38 @@ class Action(object):
             ret = self._waiting_node.pop()
             self._current = ret[0]
             self._current_node_link_cycle_times = ret[1]
-            if self._current == None:
+            
+            if self._current.action == macro._FINISHED_LINE:
                 self._return_jump()
 
     def pop(self):
         line: str = None
         is_finish = False
-        if self._current == None:
+        if self._current == None or self._current.action == macro._FINISHED_LINE:
             return None, True
-        while self._jump_node():
-            pass
-        line = self._current.action
-        if line == "body:":
-            self._current = self._current.next
-            self._return_jump()
-            if self._current == None:
-                return None, True
+        while True:
+            while self._jump_node():
+                pass
             line = self._current.action
-            self._body = self._current
-            self._body_current_node_link_cycle_times = self._current_node_link_cycle_times
-            self._body_waiting_node = []
-            for row in self._waiting_node:
-                self._body_waiting_node.append(row)
+            if line == "body:":
+                self._current = self._current.next
+                self._return_jump()
+                if self._current.action == macro._FINISHED_LINE:
+                    return None, True
+                line = self._current.action
+                self._body = self._current
+                self._body_current_node_link_cycle_times = self._current_node_link_cycle_times
+                self._body_waiting_node = []
+                for row in self._waiting_node:
+                    self._body_waiting_node.append(row)
+                continue
+            else:
+                break
         self._current = self._current.next
         self._return_jump()
-        if self._current == None:
+        if self._current.action == macro._FINISHED_LINE:
             is_finish = True
+            line = None
         return line, is_finish
 
     def reset(self):
