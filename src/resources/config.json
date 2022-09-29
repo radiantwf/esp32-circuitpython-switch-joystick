@@ -13,10 +13,10 @@
 	},
 	"macros": {
 		"autorun": {
-			"name": "雷吉洛克/雷吉斯奇鲁（定点）",
-			"loop": -1,
+			"name": "雷吉艾勒奇（定点）",
+			"loop": 99999999,
 			"paras": {
-				"secondary": "True"
+				"secondary": "False"
 			}
 		}
 	},
