@@ -82,11 +82,12 @@ class Action(object):
                 continue
             else:
                 break
-        self._current = self._current.next
-        self._return_jump()
         if self._current.action == macro._FINISHED_LINE:
             is_finish = True
             line = None
+        else:
+            self._current = self._current.next
+            self._return_jump()
         return line, is_finish
 
     def reset(self):

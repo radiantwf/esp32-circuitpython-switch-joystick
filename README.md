@@ -152,6 +152,9 @@ A virtual HID USB joystick created using ESP32S2/S3
 
 ​        后续，删除游戏，并重新安装后，卡顿问题解决，对运行效率有需求的朋友可自行修改脚本。
 
+        更新OpenCV图像识别方式，效果如下：
+<img src="imgs/recognition.webp"/>
+
 #### 开发笔记（不定期更新）
 
 [跳转](./NOTE.md)

@@ -1,0 +1,6 @@
+env
+__pycache__
+build
+*.spec
+dist
+output

@@ -1,0 +1,10 @@
+{
+	"recognize":{
+		"battle_shiny":{
+			"image":"resources/img/battle_shiny.jpg",
+			"area":{
+				"x":865,"y":430,"width":95,"height":95
+			}
+		}
+	}
+}

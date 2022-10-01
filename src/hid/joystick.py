@@ -25,31 +25,32 @@ class JoyStick:
         self._last_send_monotonic_ns = time.monotonic_ns()
 
 
-    async def _send(self,  input_line: str = ""):
+    async def _send(self,  input_line: str = "",earliest_send_key_monotonic_ns=0):
         earliest = self._last_send_monotonic_ns + _Mini_Key_Send_Span_ns
+        if earliest < earliest_send_key_monotonic_ns:
+            earliest = earliest_send_key_monotonic_ns
         input = joystick_input.JoyStickInput(input_line)
         while True:
             now = time.monotonic_ns()
             if now < earliest:
-                ns = int((earliest - now)/1000000)
-                if ns > 0:
-                    await asyncio.sleep_ms(ns)
-                else:
-                    time.sleep(float((earliest - now)%1000000000)/1000000000)
-                    break
+                ms = int((earliest - now)/1000000)
+                await asyncio.sleep_ms(ms)
+                break
             else:
                 break
+        # print((time.monotonic_ns() - earliest)/1000000)
         self._sync_send(input)
 
-    async def release(self):
-        await self._send("")
+    async def release(self,release_monotonic_ns:float = 0):
+        await self._send("",release_monotonic_ns)
 
     async def key_press(self,  input_line: str = "", keep: float = 0.005):
-        await self._send(input_line)
-        await asyncio.sleep(keep)
-        await self.release()
+        await self._send(input_line,0)
+        release_monotonic_ns = self._last_send_monotonic_ns + keep*1000000000
+        await self.release(release_monotonic_ns)
 
     async def do_action(self,  action_line: str = ""):
+        print(action_line)
         splits = action_line.split(":")
         if len(splits) > 2:
             await self.release()

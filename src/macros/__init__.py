@@ -1,4 +1,4 @@
-from macros import action,macro
+from macros import macro,action
 import hid.joystick
 import time
 import asyncio
@@ -14,7 +14,7 @@ _running: bool = False
 _current_info = ""
 _result_info = ""
 _start_time = None
-
+_action_queue = []
 
 def status_info():
     global _start_time
@@ -43,7 +43,7 @@ def result_info():
     global _result_info
     return _result_info
 
-def create_task(cmd: str):
+def add_joystick_task(cmd: str):
     try:
         return _create_task_json(json.loads(cmd))
     except:
@@ -51,6 +51,17 @@ def create_task(cmd: str):
         _result_info = "启动命令{}有错误，请检查。".format(cmd)
         return _result_info
 
+def stop():
+    global _running
+    _running = False
+    global _action_queue
+    _action_queue = []
+
+
+def action_queue_task_start():
+    tm = task_manager.TaskManager()
+    tm.create_task(_run_queue(), TASK_TAG)
+    
 
 def auto_run():
     c = config.Config()
@@ -62,9 +73,14 @@ def auto_run():
 
 
 def _create_task_json(cmd: dict):
+    s = cmd.get("stop")
     c1 = cmd.get("name")
     c2 = cmd.get("loop")
     paras = cmd.get("paras")
+    if type(s) is bool and s:
+        stop()
+        if c1==None:
+            return "停止脚本"
     if type(c1) is str:
         name = c1
     else:
@@ -74,15 +90,16 @@ def _create_task_json(cmd: dict):
         loop = c2
     else:
         loop = -1
-
+    global _action_queue
+    try:
+        _action_queue.append((name, loop, paras))
+        return "{}：已添加任务。".format((name, loop, paras))
+    except:
+         return "任务队列已满。".format((name, loop, paras))
     tm = task_manager.TaskManager()
     tm.create_task(_run(name, loop, paras), TASK_TAG)
-    return "{}：已添加任务。".format((name, loop, paras))
 
 
-def stop():
-    global _running
-    _running = False
     # tm = task_manager.TaskManager()
     # await tm.cancel_task(TASK_TAG)
 
@@ -92,9 +109,21 @@ def published():
         return json.dumps(m._publish)
     else:
         return ""
-    
 
-async def _run(name: str, loop: int = 1, paras: dict = ()):
+async def _run_queue():
+    while True:
+        t = None
+        global _action_queue
+        if len(_action_queue) > 0:
+            t = _action_queue[0]
+            _action_queue.remove(t)
+        if t == None:
+            await asyncio.sleep_ms(10)
+            continue
+        await _run(t[0],t[1],t[2])
+            
+
+async def _run(name: str, loop: int = 1, paras: dict = dict()):
     msg = "开始运行{}脚本，循环次数：{}".format(name, loop)
     print(msg)
     times = 0

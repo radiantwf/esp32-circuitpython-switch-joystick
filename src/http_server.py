@@ -85,7 +85,7 @@ def macro_start(request):
     raw_text = request.raw_request.decode("utf8")
     splits = raw_text.split("\n")
     cmd = splits[len(splits) - 1]
-    ret = macros.create_task(cmd)
+    ret = macros.add_joystick_task(cmd)
     return HTTPResponse(content_type="text/plain;charset=utf-8", body=ret)
 
 @_server.route("/")

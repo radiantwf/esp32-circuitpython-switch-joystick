@@ -40,7 +40,6 @@ class Macro(object):
         macros = self._walk_macro_files()
         for macro in macros:
             dic_action_lines = self._load_file(macro, dic_action_lines)
-
         dic_macros = dict()
         for key in dic_action_lines.keys():
             rows = dic_action_lines.get(key)
