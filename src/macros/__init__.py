@@ -61,6 +61,7 @@ def stop():
 def action_queue_task_start():
     tm = task_manager.TaskManager()
     tm.create_task(_run_queue(), TASK_TAG)
+    add_joystick_task('{"name":"common.wakeup_joystick","loop":1}')
     
 
 def auto_run():

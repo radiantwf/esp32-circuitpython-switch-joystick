@@ -38,3 +38,7 @@ class OrderSender(object):
 
     def enable(self,e):
         self._enable=e
+
+    @property
+    def enabled(self):
+        return self._enable

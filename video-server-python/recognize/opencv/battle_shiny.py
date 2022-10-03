@@ -33,6 +33,14 @@ class BattleShiny(OpenCV):
         await order.add_order(macro.macro_press_button_a_loop)
         macro_run = True
         while True:
+            if time.monotonic() - _start_monotonic > 60 and order.enabled:
+                await order.add_order(macro.macro_close_game)
+                await asyncio.sleep(1)
+                await order.add_order(macro.macro_press_button_a_loop)
+                _start_monotonic = time.monotonic()
+                macro_run = True
+                _frame_count = 0
+
             data = await self._frame.get_frame()
             image = (
                 np
@@ -72,7 +80,7 @@ class BattleShiny(OpenCV):
             except:
                 pass
 
-            if span_second < 3 and span_second > 0.15 and last_span_frame_count > 0 and not macro_run:
+            if span_second < 2 and span_second > 0.15 and last_span_frame_count > 0 and not macro_run:
                 if span_second < 0.7:
                     await order.add_order(macro.macro_close_game)
                     await asyncio.sleep(1)

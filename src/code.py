@@ -25,7 +25,7 @@ def main():
         print(wifi_connect.ip_address())
         if web_running:
             import http_server as http
-            tm.create_task(http.serve(), "http")
+            tm.create_task(http.serve(), "")
         if tcp_running:
             from tcp_server import TcpServer
             port = 5000
@@ -35,7 +35,7 @@ def main():
                 pass
             if port < 0 or port > 65535:
                 port = 5000
-            tm.create_task(TcpServer().start_serve(port), "http")
+            tm.create_task(TcpServer().start_serve(port))
     span = time.monotonic()
     if span < 15:
         time.sleep(15 - span)

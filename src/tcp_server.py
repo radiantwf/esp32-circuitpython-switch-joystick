@@ -26,16 +26,33 @@ class TcpServer(object):
 
     async def start_serve(self,port):
         tm = task_manager.TaskManager()
-        HOST = ""
+        HOST = None
+        HOST = wifi_connect.ip_address()
+        if HOST == None:
+            await asyncio.sleep(5)
+            if self._socket != None:
+                self._socket.close()
+                self._socket: socketpool.Socket = None
+                self._clients = []
+            try:
+                wifi_connect.reconnect()
+            except:
+                pass
+            tm.create_task(self.start_serve(port))
+            return
+        print("Starting TCP Server socket")
         pool = socketpool.SocketPool(wifi.radio)
-        HOST = str(wifi_connect.ip_address())
-        print("Create TCP Server socket")
         self._socket = pool.socket(pool.AF_INET, pool.SOCK_STREAM)
         self._socket.settimeout(0)
-        self._socket.bind((HOST, port))
+        self._socket.bind((str(HOST), port))
         self._socket.listen(1000)
+
         while True:
             await asyncio.sleep_ms(10)
+            if wifi_connect.ip_address() == None:
+                 tm.create_task(self.start_serve(port))
+                 self._socket.close()
+                 return
             try:
                 client = None
                 try:
@@ -44,10 +61,11 @@ class TcpServer(object):
                 except OSError as e:
                     if e.errno != EAGAIN:
                         raise e
-                self._clients.append(client)
-                client.settimeout(0)
-                tm.create_task(self.tcp_handler(client))
-            except:
+                if client != None:
+                    self._clients.append(client)
+                    client.settimeout(0)
+                    tm.create_task(self.tcp_handler(client))
+            except OSError as e:
                 if client != None:
                     self._clients.remove(client)
 
@@ -78,6 +96,5 @@ class TcpServer(object):
                     ret = macros.add_joystick_task(data)
                     client_socket.send(ret.encode('utf-8'))
                     # client_socket.send(data.encode('utf-8'))
-
         except:
             self._clients.remove(client_socket)

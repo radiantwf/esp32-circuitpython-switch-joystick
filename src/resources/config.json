@@ -13,6 +13,7 @@
 	},
 	"macros": {
 		"autorun": {
+			"stop":false,
 			"name": "雷吉艾勒奇（定点）",
 			"loop": 99999999,
 			"paras": {
@@ -24,7 +25,7 @@
 		"running":false
 	},
 	"tcp-server": {
-		"running":false,
+		"running":true,
 		"port":5000
 	}
 }

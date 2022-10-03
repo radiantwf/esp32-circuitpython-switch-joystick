@@ -1,12 +1,13 @@
 import platform
 class VideoDevice(object):
-    def __init__(self,name:str,width:int,height:int,fps:int,pix_fmt:str = None,vcodec:str = None):
+    def __init__(self,name:str,width:int,height:int,fps:int,index:int=0,pix_fmt:str = None,vcodec:str = None):
         self._name = name
         self._width = width
         self._height = height
         self._fps = fps
         self._pix_fmt = pix_fmt
         self._vcodec = vcodec
+        self._index = index
         self._sys_str = platform.system()
 
     @property
@@ -37,6 +38,9 @@ class VideoDevice(object):
     @property
     def fps(self):
         return self._fps
+    @property
+    def index(self):
+        return self._index
     @property
     def pix_fmt(self):
         return self._pix_fmt

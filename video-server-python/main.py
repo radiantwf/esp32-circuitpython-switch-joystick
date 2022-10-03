@@ -15,15 +15,16 @@ _Audio_Device_Name = "USB Digital Audio"
 
 _Display_Width = 960
 _Display_Height = 540
-_Display_FPS = 30
+_Display_FPS = 60
+_Recognize_FPS = 30
 
 # _Camera_Name = "FaceTime高清摄像头（内建）"
 # _Camera_FPS = 30
 # _Audio_Device_Name = "内建麦克风"
 
 def main():
-    dev_video = device.VideoDevice(name=_Camera_Name,width=_Camera_Width,height=_Camera_Height,fps=_Camera_FPS,pix_fmt=None,vcodec="mjpeg")
-    # dev_video = device.VideoDevice(name=_Camera_Name,width=_Camera_Width,height=_Camera_Height,fps=_Camera_FPS,pix_fmt="bgr0")
+    dev_video = device.VideoDevice(name=_Camera_Name,width=_Camera_Width,height=_Camera_Height,fps=_Camera_FPS,index=0,pix_fmt=None,vcodec="mjpeg")
+    # dev_video = device.VideoDevice(name=_Camera_Name,width=_Camera_Width,height=_Camera_Height,fps=_Camera_FPS,index=1,pix_fmt="bgr0")
     dev_audio = device.AudioDevice(name=_Audio_Device_Name,sample_rate=44100,channels=2)
     dev_joystick = device.JoystickDevice(host="192.168.50.122",port=5000)
     main_video_frame,capture_video_frame = multiprocessing.Pipe(False)
@@ -34,7 +35,7 @@ def main():
     ui_process.start()
     video_process = multiprocessing.Process(target=capture.capture_video, args=(capture_video_frame,dev_video,_Display_Width,_Display_Height,_Display_FPS,))
     video_process.start()
-    recognize_process = multiprocessing.Process(target=recognize.run, args=(recognize_video_frame,opencv_processed_video_frame,dev_joystick,_Display_Width,_Display_Height,30,))
+    recognize_process = multiprocessing.Process(target=recognize.run, args=(recognize_video_frame,opencv_processed_video_frame,dev_joystick,_Display_Width,_Display_Height,_Recognize_FPS,))
     recognize_process.start()
     try:
         while True:

@@ -1,7 +1,6 @@
 --雷吉艾勒奇--
 <regieleki|雷吉艾勒奇（定点）|999999--secondary|副设备(副设备启动游戏时校验)|False>
 {
-	[common.wakeup_joystick]
 	[pokemon.swsh.common.restart_game]
 	body:
 	A:0.1
@@ -60,7 +59,6 @@
 --雷吉洛克/雷吉斯奇鲁--
 <regirock|雷吉洛克/雷吉斯奇鲁（定点）|999999--secondary|副设备(副设备启动游戏时校验)|False>
 {
-	[common.wakeup_joystick]
 	[pokemon.swsh.common.restart_game]
 	body:
 	A:0.1

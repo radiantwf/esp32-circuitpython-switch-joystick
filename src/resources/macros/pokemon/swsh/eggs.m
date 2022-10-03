@@ -1,7 +1,6 @@
 --饲育屋取蛋--
 <get_eggs|饲育屋取蛋>
 {
-	[common.wakeup_joystick]
 	body:
 	{
 		LStick@-127,0:1.7

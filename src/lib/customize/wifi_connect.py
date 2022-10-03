@@ -11,8 +11,17 @@ print(_ssid)
 print(_pwd)
 print(_hostname)
 
-
 def connect():
+    if _hostname != None and _hostname != "":
+        wifi.radio.hostname = _hostname
+    if _wifi_type == "ap":
+        wifi.radio.start_ap(_ssid, _pwd)
+    else:
+        wifi.radio.connect(_ssid, _pwd)
+
+def reconnect():
+    if ip_address() != None:
+        return
     if _hostname != None and _hostname != "":
         wifi.radio.hostname = _hostname
     if _wifi_type == "ap":
