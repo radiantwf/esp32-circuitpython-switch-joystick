@@ -8,9 +8,9 @@ def run(frame_queue,processed_frame_queue,dev:AudioDevice,video_with,video_heigh
 
 def _show(frame_queue,processed_frame_queue,dev:AudioDevice,video_with,video_height):
     app = QtWidgets.QApplication()
-    MainWindow = QtWidgets.QMainWindow()
-    ui = UserWindows(frame_queue,processed_frame_queue,dev,video_with,video_height)
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    _main_window = UserWindows(frame_queue,processed_frame_queue,dev,video_with,video_height)
+    app.installEventFilter(_main_window)
+    _main_window.setupUi()
+    _main_window.show()
     ret = app.exec_()
     sys.exit(ret)

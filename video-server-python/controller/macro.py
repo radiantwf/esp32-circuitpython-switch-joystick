@@ -16,6 +16,6 @@ class Macro(object):
     def message(self):
         return json.dumps(self._dict).encode("utf-8")
 
-macro_action_clear = Macro(True,None)
+macro_action_clear = Macro(True,name=None)
 macro_close_game = Macro(True,name="common.close_game",loop=1)
 macro_press_button_a_loop = Macro(False,name="common.press_button_a",loop=100)
