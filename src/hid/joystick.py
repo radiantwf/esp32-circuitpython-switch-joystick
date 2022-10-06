@@ -24,6 +24,7 @@ class JoyStick:
             self._realtime_data_lock = asyncio.Lock()
             self._is_realtime = False
             self._realtime_action = ""
+            self._realtime_task = None
             try:
                 self._sync_release()
             except OSError:
@@ -81,13 +82,22 @@ class JoyStick:
                 pass
             await self.key_press(splits[0], keep)
 
-    async def start_realtime(self):
+    def start_realtime(self):
+        if self._realtime_task:
+            return
         self._is_realtime = True
+        self._realtime_task = asyncio.create_task(self._start_realtime_async())
+
+    def stop_realtime(self):
+        self._is_realtime = False
+        self._realtime_task = None
+
+    async def _start_realtime_async(self):
         async with self._realtime_data_lock:
             self._realtime_action = ""
         await self._send(self._realtime_action)
         last_action = ""
-        last_action_monotonic = time.now()
+        last_action_monotonic = time.monotonic()
         while self._is_realtime:
             await asyncio.sleep_ms(int(_Mini_Key_Send_Span_ns/1000000))
             action = None
@@ -97,6 +107,7 @@ class JoyStick:
                 if self._realtime_action != last_action:
                     action = self._realtime_action
                     last_action = action
+                    last_action_monotonic = time.monotonic()
             if action != None:
                 await self._send(action)
         await self._send("")
@@ -106,5 +117,9 @@ class JoyStick:
         async with self._realtime_data_lock:
             self._realtime_action = action.strip()
 
-    async def stop_realtime(self,action:str):
+    async def _stop_realtime_async(self):
         self._is_realtime = False
+        if not self._realtime_task:
+            return
+        await self._realtime_task
+        self._realtime_task = None

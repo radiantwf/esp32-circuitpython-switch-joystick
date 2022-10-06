@@ -70,7 +70,7 @@ def macro_result(request):
 
 @_server.route("/macro/stop", "GET")
 def macro_stop(request):
-    macros.stop()
+    macros.macro_stop()
     return HTTPResponse(content_type="text/plain;charset=utf-8",
                         body="Done")
 

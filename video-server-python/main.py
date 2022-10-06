@@ -1,4 +1,5 @@
 import capture
+import controller
 import datatype.device as device
 import recognize
 import ui
@@ -31,12 +32,18 @@ def main():
     ui_display_video_frame = multiprocessing.Queue()
     opencv_processed_video_frame = multiprocessing.Queue()
     recognize_video_frame = multiprocessing.Queue(1)
-    ui_process = multiprocessing.Process(target=ui.run, args=(ui_display_video_frame,opencv_processed_video_frame,dev_audio,_Display_Width,_Display_Height))
+    frame_queues = (recognize_video_frame,ui_display_video_frame,opencv_processed_video_frame,)
+    controller_action_queue = multiprocessing.Queue()
+    opencv_processed_control_queue = multiprocessing.Queue()
+    control_queues=(opencv_processed_control_queue,controller_action_queue,)
+    controller_process = multiprocessing.Process(target=controller.run, args=(dev_joystick,control_queues,))
+    controller_process.start()
+    ui_process = multiprocessing.Process(target=ui.run, args=(frame_queues,control_queues,dev_audio,_Display_Width,_Display_Height))
     ui_process.start()
+    recognize_process = multiprocessing.Process(target=recognize.run, args=(frame_queues,control_queues,_Display_Width,_Display_Height,_Recognize_FPS,))
+    recognize_process.start()
     video_process = multiprocessing.Process(target=capture.capture_video, args=(capture_video_frame,dev_video,_Display_Width,_Display_Height,_Display_FPS,))
     video_process.start()
-    recognize_process = multiprocessing.Process(target=recognize.run, args=(recognize_video_frame,opencv_processed_video_frame,dev_joystick,_Display_Width,_Display_Height,_Recognize_FPS,))
-    recognize_process.start()
     try:
         while True:
             if not ui_process.is_alive():
@@ -55,6 +62,7 @@ def main():
     except:
         pass
     finally:
+        controller_process.kill()
         video_process.kill()
         recognize_process.kill()
         ui_process.kill()

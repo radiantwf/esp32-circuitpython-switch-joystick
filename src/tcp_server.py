@@ -75,7 +75,7 @@ class TcpServer(object):
         try:
             size = 0
             while True:
-                await asyncio.sleep_ms(10)
+                await asyncio.sleep_ms(1)
                 if time.monotonic() - last_active_ts > 10:
                     client_socket.send("ping".encode('utf-8'))
                     last_active_ts = time.monotonic()
@@ -94,7 +94,8 @@ class TcpServer(object):
                     last_active_ts = time.monotonic()
                     data = data.decode('utf-8')
                     ret = macros.add_joystick_task(data)
-                    client_socket.send(ret.encode('utf-8'))
+                    if ret and ret != "":
+                        client_socket.send(ret.encode('utf-8'))
                     # client_socket.send(data.encode('utf-8'))
         except:
             self._clients.remove(client_socket)

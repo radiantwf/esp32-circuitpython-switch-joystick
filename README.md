@@ -142,11 +142,7 @@ A virtual HID USB joystick created using ESP32S2/S3
 
 ### 运行效果
 
-<img src="imgs/registeel.webp"/>
-
-​        由于编写脚本时，NS主机数据故障，导致游戏经常性卡顿，所以等待时间较长，并且斜线行走会导致偶尔执行过程中位置不正确，所以采用直线行走方式编写脚本。运行效率偏低，观感不是很好。
-
-​        简单优化脚本后，效果如下：
+<img src="imgs/show.webp"/>
 
 <img src="imgs/registeel2.webp"/>
 

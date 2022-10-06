@@ -1,4 +1,7 @@
 from io import StringIO
+from controller import macro
+from recognize import opencv
+from ui.log import LogThread
 from ui.ui_win import Ui_MainWindow
 from PySide6 import QtWidgets
 from datatype.device import AudioDevice
@@ -9,17 +12,20 @@ from ui.video import VideoThread
 import time
 
 class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
-    def __init__(self,frame_queue,processed_frame_queue,dev:AudioDevice,video_with,video_height):
+    def __init__(self,frame_queues,control_queues,dev:AudioDevice,video_with,video_height):
         QtWidgets.QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self._audio_device = dev
         self._video_with = video_with
         self._video_height = video_height
-        self._frame_queue = frame_queue
-        self._processed_frame_queue = processed_frame_queue
+        self._frame_queue = frame_queues[1]
+        self._processed_frame_queue = frame_queues[2]
+        self._processed_control_queue = control_queues[0]
+        self._controller_action_queue = control_queues[1]
         self._key_press_map = dict()
         self._last_sent_action = ""
         self._last_sent_ts = time.monotonic()
+        self._current_tag = None
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.KeyPress:
@@ -97,6 +103,10 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
 
         
     def key_send(self):
+        if self._current_tag != "实时控制":
+            self._key_press_map.clear()
+            self.label_action.setText("")
+
         self._set_joystick_label(Qt.Key_A,self.label_a)
         self._set_joystick_label(Qt.Key_W,self.label_w)
         self._set_joystick_label(Qt.Key_S,self.label_s)
@@ -114,7 +124,7 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         self._set_joystick_label(Qt.Key_B,self.label_b)
         self._set_joystick_label(Qt.Key_V,self.label_v)
 
-        self._set_joystick_label(Qt.Key_T,self.label_t)
+        self._set_joystick_label(Qt.Key_R,self.label_r)
         self._set_joystick_label(Qt.Key_Y,self.label_y)
         self._set_joystick_label(Qt.Key_G,self.label_g)
         self._set_joystick_label(Qt.Key_H,self.label_h)
@@ -129,14 +139,15 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         self._set_joystick_label(Qt.Key_L,self.label_l)
         self._set_joystick_label(Qt.Key_K,self.label_k)
 
-        action = self._get_action_line()
-        
-        if action != self._last_sent_action or time.monotonic() - self._last_sent_ts > 5:
-            self._last_sent_action = action
-            self._last_sent_ts = time.monotonic()
-            self.label_action.setText("实时命令：{}".format(action))
+        if self._current_tag == "实时控制":
+            action = self._get_action_line()
+            if action != self._last_sent_action or time.monotonic() - self._last_sent_ts > 5:
+                self._last_sent_action = action
+                self._last_sent_ts = time.monotonic()
+                self.label_action.setText("实时命令：{}".format(action))
+                self._controller_action_queue.put_nowait(macro.Realtime(action))
         self.repaint()
-        
+
     
     def _set_joystick_label(self,key,label):
         if self._key_press_map.get(key) != None:
@@ -164,7 +175,7 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         if self._key_press_map.get(Qt.Key_O):
             sio.write("ZR|")
 
-        if self._key_press_map.get(Qt.Key_T):
+        if self._key_press_map.get(Qt.Key_R):
             sio.write("MINUS|")
         if self._key_press_map.get(Qt.Key_Y):
             sio.write("PLUS|")
@@ -189,9 +200,9 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         x = 0
         y = 0
         if self._key_press_map.get(Qt.Key_W):
-            y = 127
-        elif self._key_press_map.get(Qt.Key_S):
             y = -127
+        elif self._key_press_map.get(Qt.Key_S):
+            y = 127
         if self._key_press_map.get(Qt.Key_D):
             x = 127
         elif self._key_press_map.get(Qt.Key_A):
@@ -201,9 +212,9 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         x = 0
         y = 0
         if self._key_press_map.get(Qt.Key_Semicolon):
-            y = 127
-        elif self._key_press_map.get(Qt.Key_Period):
             y = -127
+        elif self._key_press_map.get(Qt.Key_Period):
+            y = 127
         if self._key_press_map.get(Qt.Key_Period):
             x = 127
         elif self._key_press_map.get(Qt.Key_Comma):
@@ -217,10 +228,27 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
     
     def setupUi(self):
         Ui_MainWindow.setupUi(self,self)
+        self.textBrowser.document().setMaximumBlockCount(1000)
+        items = []
+        items.append("")
+        items.append("实时控制")
+        for e in opencv.opencv_list():
+            items.append("图像识别："+e)
+        for e in macro.public_macros():
+            items.append("脚本（无识别）：" + e)
+        self.comboBox.addItems(items)
+        self.pushButton.clicked.connect(self.button_click)
+
         self.th_video = VideoThread(self)
         self.th_video.set_input(self._video_with,self._video_height,3,QImage.Format_BGR888,self._frame_queue)
         self.th_video.video_frame.connect(self.setImage2)
         self.th_video.start()
+
+        self.th_log = LogThread(self)
+        self.th_log.set_port()
+        self.th_log.log.connect(self.setLog)
+        self.th_log.start()
+        
         self.th_processed = VideoThread(self)
         self.th_processed.set_input(self._video_with,self._video_height,3,QImage.Format_BGR888,self._processed_frame_queue)
         self.th_processed.video_frame.connect(self.setImage1)
@@ -230,6 +258,31 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         self.timer.timeout.connect(self.key_send)
         self.timer.start(5)
         self.destroyed.connect(self.on_destroy)
+        self.button_click()
+
+
+    @Slot()
+    def button_click(self):
+        tag = self.comboBox.currentText()
+        if tag == self._current_tag:
+            return
+        if tag == "":
+            self._processed_control_queue.put("NoneOpenCV")
+        elif tag.startswith("实时控制"):
+            self._controller_action_queue.put(macro.realtime_action_start)
+            time.sleep(0.01)
+            self._processed_control_queue.put("NoneOpenCV")
+        elif tag.startswith("图像识别："):
+            self._controller_action_queue.put(macro.realtime_action_stop)
+            time.sleep(0.01)
+            self._processed_control_queue.put(tag[len("图像识别："):])
+        elif tag.startswith("脚本（无识别）："):
+            self._processed_control_queue.put("NoneOpenCV")
+            time.sleep(0.01)
+            self._controller_action_queue.put(macro.realtime_action_stop)
+            time.sleep(0.01)
+            self._controller_action_queue.put(macro.get_public_macro(tag[len("脚本（无识别）："):]))
+        self._current_tag = tag
 
     def play_audio(self):
         if not self._audio_device:
@@ -259,18 +312,20 @@ class UserWindows(QtWidgets.QMainWindow,Ui_MainWindow):
         pixmap = QPixmap.fromImage(image).scaled(self.label_2.size(), aspectMode=Qt.KeepAspectRatio)
         self.label_2.setPixmap(pixmap)
 
+    @Slot(str)
+    def setLog(self, log):
+        self.textBrowser.append(log)
+        
     @Slot()
     def on_destroy(self):
-        self._frame_queue.close()
         self.timer.stop()
+        self.th_log.terminate()
         self.th_video.terminate()
         self.th_processed.terminate()
-        # self.th_audio.terminate()
         if self._audio_input != None:
             self._audio_input.stop()
         self._m_audioSink.stop()
-        # self._audio_input.stop()
-        # self._io_device.stop()
+        self._frame_queue.close()
     
 
     @Slot()
