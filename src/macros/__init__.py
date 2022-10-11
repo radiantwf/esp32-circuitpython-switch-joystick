@@ -3,11 +3,10 @@ import hid.joystick
 import time
 import asyncio
 import json
-import usb_hid
 import customize.config as config
 import customize.task_manager as task_manager
 
-joystick = hid.joystick.JoyStick(usb_hid.devices)
+joystick = hid.joystick.JoyStickFactory.get_instance()
 
 TASK_TAG: str = "macros"
 _macro_running: bool = False

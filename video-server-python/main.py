@@ -27,7 +27,7 @@ def main():
     dev_video = device.VideoDevice(name=_Camera_Name,width=_Camera_Width,height=_Camera_Height,fps=_Camera_FPS,index=0,pix_fmt=None,vcodec="mjpeg")
     # dev_video = device.VideoDevice(name=_Camera_Name,width=_Camera_Width,height=_Camera_Height,fps=_Camera_FPS,index=1,pix_fmt="bgr0")
     dev_audio = device.AudioDevice(name=_Audio_Device_Name,sample_rate=44100,channels=2)
-    dev_joystick = device.JoystickDevice(host="192.168.50.122",port=5000)
+    dev_joystick = device.JoystickDevice(host="192.168.50.120",port=5000)
     main_video_frame,capture_video_frame = multiprocessing.Pipe(False)
     ui_display_video_frame = multiprocessing.Queue()
     opencv_processed_video_frame = multiprocessing.Queue()

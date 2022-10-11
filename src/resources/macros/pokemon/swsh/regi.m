@@ -13,35 +13,26 @@
 	A:0.1
 	0.5
 	# 走到左上角墙角
-	LStick@-127,0:1.8
-	LStick@9,0:0.05
+	LStick@-127,0:1.8->LStick@9,0:0.05
 	0.3
-	LStick@0,-127:0.8
-	LStick@0,9:0.05
+	LStick@0,-127:0.8->LStick@0,9:0.05
 	0.2
-	LStick@0,-127:0.3
-	LStick@9,0:0.05
+	LStick@0,-127:0.3->LStick@9,0:0.05
 	0.3
-	LStick@-127,0:0.3
-	LStick@9,0:0.05
+	LStick@-127,0:0.3->LStick@9,0:0.05
 	0.7
 	# 踩灯 第3排
-	LStick@0,127:1.62
-	LStick@0,-9:0.05
+	LStick@0,127:1.62->LStick@0,-9:0.05
 	0.3
-	LStick@127,0:2.5
-	LStick@-9,0:0.05
+	LStick@127,0:2.5->LStick@-9,0:0.05
 	0.7
 	# 踩灯 第2排
-	LStick@0,-127:0.42
-	LStick@0,9:0.05
+	LStick@0,-127:0.42->LStick@0,9:0.05
 	0.3
-	LStick@-127,0:2.1
-	LStick@9,0:0.05
+	LStick@-127,0:2.1->LStick@9,0:0.05
 	0.7
 	# 踩灯 第1排
-	LStick@0,-127:0.42
-	LStick@0,9:0.05
+	LStick@0,-127:0.42->LStick@0,9:0.05
 	0.3
 	LStick@127,0:2.7
 	3
@@ -71,35 +62,26 @@
 	A:0.1
 	0.5
 	# 走到左上角墙角
-	LStick@-127,0:1.8
-	LStick@9,0:0.05
+	LStick@-127,0:1.8->LStick@9,0:0.05
 	0.3
-	LStick@0,-127:0.8
-	LStick@0,9:0.05
+	LStick@0,-127:0.8->LStick@0,9:0.05
 	0.2
-	LStick@0,-127:0.3
-	LStick@9,0:0.05
+	LStick@0,-127:0.3->LStick@9,0:0.05
 	0.3
-	LStick@-127,0:0.3
-	LStick@9,0:0.05
+	LStick@-127,0:0.3->LStick@9,0:0.05
 	0.7
 	# 踩灯 第3排
-	LStick@0,127:1.72
-	LStick@0,-9:0.05
+	LStick@0,127:1.72->LStick@0,-9:0.05
 	0.3
-	LStick@127,0:2.5
-	LStick@-9,0:0.05
+	LStick@127,0:2.5->LStick@-9,0:0.05
 	0.7
 	# 踩灯 第2排
-	LStick@0,-127:0.53
-	LStick@0,9:0.05
+	LStick@0,-127:0.53->LStick@0,9:0.05
 	0.3
-	LStick@-127,0:2.1
-	LStick@9,0:0.05
+	LStick@-127,0:2.1->LStick@9,0:0.05
 	0.7
 	# 踩灯 第1排
-	LStick@0,-127:0.53
-	LStick@0,9:0.05
+	LStick@0,-127:0.53->LStick@0,9:0.05
 	0.3
 	LStick@127,0:2.7
 	3

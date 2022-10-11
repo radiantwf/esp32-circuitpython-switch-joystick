@@ -21,8 +21,8 @@ RUN esp-idf/install.sh
 WORKDIR /root/circuitpython/ports/espressif/boards
 RUN sed -i 's/USB_VID = 0x303A/USB_VID = 0x0F0D/g' lolin_s2_mini/mpconfigboard.mk && \
 	sed -i 's/USB_PID = 0x80C3/USB_PID = 0x00C1/g' lolin_s2_mini/mpconfigboard.mk && \
-	sed -i 's/USB_PRODUCT = "S2 Mini"/USB_PRODUCT = "HORI CO.,LTD."/g' lolin_s2_mini/mpconfigboard.mk && \
-	sed -i 's/USB_MANUFACTURER = "Lolin"/USB_MANUFACTURER = "HORIPAD S"/g' lolin_s2_mini/mpconfigboard.mk
+	sed -i 's/USB_PRODUCT = "S2 Mini"/USB_PRODUCT = "HORIPAD S"/g' lolin_s2_mini/mpconfigboard.mk && \
+	sed -i 's/USB_MANUFACTURER = "Lolin"/USB_MANUFACTURER = "HORI CO.,LTD."/g' lolin_s2_mini/mpconfigboard.mk
 
 WORKDIR /root/circuitpython/ports/espressif
 

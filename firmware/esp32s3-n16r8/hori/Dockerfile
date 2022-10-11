@@ -24,8 +24,8 @@ RUN cp -r espressif_esp32s3_devkitc_1_n8r2 espressif_esp32s3_devkitc_1_n16r8 && 
 	sed -i 's/ESP32-S3-DevKitC-1-N8R2/ESP32-S3-DevKitC-1-N16R8/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.h && \
 	sed -i 's/USB_VID = 0x303A/USB_VID = 0x0F0D/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
 	sed -i 's/USB_PID = 0x7003/USB_PID = 0x00C1/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
-	sed -i 's/USB_PRODUCT = "ESP32-S3-DevKitC-1-N8R2"/USB_PRODUCT = "HORI CO.,LTD."/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
-	sed -i 's/USB_MANUFACTURER = "Espressif"/USB_MANUFACTURER = "HORIPAD S"/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
+	sed -i 's/USB_PRODUCT = "ESP32-S3-DevKitC-1-N8R2"/USB_PRODUCT = "HORIPAD S"/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
+	sed -i 's/USB_MANUFACTURER = "Espressif"/USB_MANUFACTURER = "HORI CO.,LTD."/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
 	# CIRCUITPY_ESP_FLASH_MODE DIO -> QIO
 	sed -i 's/dio/qio/g' espressif_esp32s3_devkitc_1_n16r8/mpconfigboard.mk && \
 	# CIRCUITPY_ESP_FLASH_SIZE 8MB -> 16MB

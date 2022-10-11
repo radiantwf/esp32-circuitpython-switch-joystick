@@ -1,11 +1,13 @@
+import hid.device.hori
+import hid.joystick
+hid.joystick.JoyStickFactory.get_instance(hid.device.hori.Tag)
+
+
 import macros
 import time
 import customize.wifi_connect as wifi_connect
 import customize.task_manager as task_manager
 import customize.config as config
-
-print("hello hori")
-
 
 def main():
     c = config.Config()

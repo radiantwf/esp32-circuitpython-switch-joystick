@@ -1,25 +1,25 @@
 import time
 from adafruit_hid import find_device
-from hid import joystick_input
 import asyncio
-
+from hid.joystick.input.hori import JoyStickInput_HORI_S
+from hid.joystick.joystick import JoyStick
+import usb_hid
 
 _Mini_Key_Send_Span_ns = 3000000
 
-class JoyStick:
+class JoyStick_HORI_S(JoyStick):
     def __new__(cls, *args, **kwargs):
         if not hasattr(cls, '_instance'):
-            cls._instance = super(JoyStick, cls).__new__(cls)
+            cls._instance = super(JoyStick_HORI_S, cls).__new__(cls)
         return cls._instance
 
     _first = True
 
-    def __init__(self, devices):
+    def __init__(self):
         if self._first:
             self._first = False
-            self._first = False
             self._joystick_device = find_device(
-                devices, usage_page=0x1, usage=0x05)
+                usb_hid.devices, usage_page=0x1, usage=0x05)
             self._last_send_monotonic_ns = 0
             self._realtime_data_lock = asyncio.Lock()
             self._is_realtime = False
@@ -32,9 +32,9 @@ class JoyStick:
                 self._sync_release()
 
     def _sync_release(self):
-        self._sync_send(joystick_input.JoyStickInput(""))
+        self._sync_send(JoyStickInput_HORI_S(""))
 
-    def _sync_send(self,input:joystick_input.JoyStickInput):
+    def _sync_send(self,input:JoyStickInput_HORI_S):
         self._joystick_device.send_report(input.buffer())
         self._last_send_monotonic_ns = time.monotonic_ns()
 
@@ -43,44 +43,56 @@ class JoyStick:
         earliest = self._last_send_monotonic_ns + _Mini_Key_Send_Span_ns
         if earliest < earliest_send_key_monotonic_ns:
             earliest = earliest_send_key_monotonic_ns
-        input = joystick_input.JoyStickInput(input_line)
+        input = JoyStickInput_HORI_S(input_line)
+        loop = 0
         while True:
+            loop += 1
             now = time.monotonic_ns()
-            if now < earliest:
-                ms = int((earliest - now)/1000000)
+            if now >= earliest:
+                break
+            elif now < earliest - _Mini_Key_Send_Span_ns:
+                ms = int((earliest - now  - _Mini_Key_Send_Span_ns)/1000000)
                 await asyncio.sleep_ms(ms)
-                break
             else:
-                break
-        # print((time.monotonic_ns() - earliest)/1000000)
+                time.sleep(0.0001)
+        t1 = time.monotonic_ns()
         self._sync_send(input)
+        t2 = time.monotonic_ns()
+        # print((t2 - t1)/1000000,(t1 - earliest)/1000000,loop,input_line)
 
     async def release(self,release_monotonic_ns:float = 0):
         await self._send("",release_monotonic_ns)
 
-    async def key_press(self,  input_line: str = "", keep: float = 0.005):
-        await self._send(input_line,0)
-        release_monotonic_ns = self._last_send_monotonic_ns + keep*1000000000
+    async def _key_press(self,  inputs = []):
+        release_monotonic_ns = 0
+        for input_line in inputs:
+            await self._send(input_line[0],release_monotonic_ns)
+            release_monotonic_ns = self._last_send_monotonic_ns + input_line[1]*1000000000
         await self.release(release_monotonic_ns)
 
     async def do_action(self,  action_line: str = ""):
-        splits = action_line.split(":")
-        if len(splits) > 2:
-            await self.release()
-            return
-        if len(splits) == 1:
-            try:
-                keep = float(splits[0])
-                await self.key_press("", keep)
-            except:
-                await self.key_press(splits[0], 0.1)
-        else:
-            keep = 0.1
-            try:
-                keep = float(splits[1])
-            except:
-                pass
-            await self.key_press(splits[0], keep)
+        inputs = []
+        actions = action_line.split("->")
+        for action in actions:
+            splits = action.split(":")
+            if len(splits) > 2:
+                continue
+            p1 = splits[0]
+            p2 = 0.1
+            if len(splits) == 1:
+                try:
+                    p2 = float(splits[0])
+                    p1 = ""
+                except:
+                    pass
+            else:
+                try:
+                    p2 = float(splits[1])
+                except:
+                    pass
+            inputs.append((p1,p2))
+        await self._key_press(inputs)
+
 
     def start_realtime(self):
         if self._realtime_task:

@@ -1,3 +1,5 @@
+from hid.joystick.input.joystick_input import JoyStickInput
+
 _Input0_Y = 0b1
 _Input0_B = 0b10
 _Input0_A = 0b100
@@ -24,8 +26,7 @@ _Input2_DPadLeft = 6
 _Input2_DPadTopLeft = 7
 _Input2_DPadCenter = 8
 
-
-class JoyStickInput:
+class JoyStickInput_HORI_S(JoyStickInput):
     def __init__(self, input_line):
         self._buffer = bytearray(8)
         self._buffer[2] = _Input2_DPadCenter
