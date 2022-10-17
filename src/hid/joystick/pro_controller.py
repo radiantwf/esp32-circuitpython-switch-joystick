@@ -5,7 +5,7 @@ import usb_hid
 import time
 import asyncio
 _Min_Key_Send_Span_ns = 3 * 1000000
-_Key_Send_Loop_Span_ms = 2
+_Key_Send_Loop_Span_ms = 3
 _Send_Bytes_Length = 63
 _Space_Buffer = bytearray(_Send_Bytes_Length)
 
