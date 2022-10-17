@@ -5,7 +5,7 @@ import usb_hid
 import time
 import asyncio
 _Min_Key_Send_Span_ns = 3 * 1000000
-_Key_Send_Loop_Span_ms = 3
+_Key_Send_Loop_Span_ms = 1
 _Send_Bytes_Length = 63
 _Space_Buffer = bytearray(_Send_Bytes_Length)
 
@@ -31,14 +31,13 @@ class JoyStick_PRO_CONTROLLER(JoyStick):
                 usb_hid.devices, usage_page=0x01, usage=0x04)
 
     def _get_counter(self):
-        return int((time.monotonic_ns() - self._start_ns) / 10000000 ) & 0xff
+        return int((time.monotonic_ns() - self._start_ns) * 360 / 1000000000 ) & 0xff
     
     async def _send_loop(self):
         while True:
-            if not self._connected:
-                await asyncio.sleep_ms(_Key_Send_Loop_Span_ms)
-                continue
             await asyncio.sleep_ms(_Key_Send_Loop_Span_ms)
+            if not self._connected:
+                continue
             action_line = ""
             async with self._action_lock:
                 action_line = self._action_line
