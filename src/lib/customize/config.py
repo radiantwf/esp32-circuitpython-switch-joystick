@@ -10,8 +10,8 @@ class Config(object):
     _first = True
 
     def __init__(self):
-        if self._first:
-            self._first = False
+        if Config._first:
+            Config._first = False
             self._config = dict()
             self._autorun = None
             self._load_file()

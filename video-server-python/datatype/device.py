@@ -57,10 +57,7 @@ class AudioDevice(object):
     
     @property
     def name(self):
-        if self._sys_str == "Windows":
-            return "数字音频接口 ({})".format(self._name)
-        else:
-            return ":{}".format(self._name)
+        return self._name
 
     @property
     def ffmepg_name(self):

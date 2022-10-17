@@ -2,7 +2,6 @@ import usb_hid
 
 Tag = "HORIPAD S"
 
-# This is only one example of a gamepad descriptor, and may not suit your needs.
 _HORIPAD_S_DESCRIPTOR = bytes((
     0x05, 0x01,             # Generic desktop controls
     0x09, 0x05,             # Joystick

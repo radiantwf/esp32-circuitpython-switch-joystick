@@ -10,8 +10,8 @@ class TaskManager(object):
     _first = True
 
     def __init__(self):
-        if self._first:
-            self._first = False
+        if TaskManager._first:
+            TaskManager._first = False
             self._loop = asyncio.get_event_loop()
             self._dic_tasks = dict()
 

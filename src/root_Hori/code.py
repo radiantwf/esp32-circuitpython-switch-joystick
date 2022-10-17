@@ -1,8 +1,6 @@
+import hid.device.hori
 import hid.joystick
-import hid.device.switch_pro
-device = hid.device.switch_pro.Tag
-print(device)
-hid.joystick.JoyStickFactory.get_instance(device)
+hid.joystick.JoyStickFactory.get_instance(hid.device.hori.Tag)
 
 
 import macros
@@ -43,8 +41,6 @@ def main():
     span = time.monotonic()
     if span < 15:
         time.sleep(15 - span)
-    joystick = hid.joystick.JoyStickFactory.get_instance()
-    tm.create_task(joystick.start())
     macros.action_queue_task_start()
     macros.auto_run()
 

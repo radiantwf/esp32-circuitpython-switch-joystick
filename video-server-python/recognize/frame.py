@@ -11,7 +11,8 @@ class Frame(object):
     _first = True
 
     def __init__(self,width = 960,height = 540,fps = 5):
-        if self._first:
+        if Frame._first:
+            Frame._first = False
             self._queue = asyncio.Queue(1)
             self._raw = None
             self._width = width

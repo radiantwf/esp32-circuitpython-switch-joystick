@@ -18,8 +18,8 @@ class TcpServer(object):
 
     _first = True
     def __init__(self):
-        if self._first:
-            self._first = False
+        if TcpServer._first:
+            TcpServer._first = False
             self._on_message = None
             self._socket: socketpool.Socket = None
             self._clients = []

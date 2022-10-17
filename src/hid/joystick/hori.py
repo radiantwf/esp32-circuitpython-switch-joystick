@@ -16,8 +16,8 @@ class JoyStick_HORI_S(JoyStick):
     _first = True
 
     def __init__(self):
-        if self._first:
-            self._first = False
+        if JoyStick_HORI_S._first:
+            JoyStick_HORI_S._first = False
             self._joystick_device = find_device(
                 usb_hid.devices, usage_page=0x1, usage=0x05)
             self._last_send_monotonic_ns = 0
@@ -37,7 +37,6 @@ class JoyStick_HORI_S(JoyStick):
     def _sync_send(self,input:JoyStickInput_HORI_S):
         self._joystick_device.send_report(input.buffer())
         self._last_send_monotonic_ns = time.monotonic_ns()
-
 
     async def _send(self,  input_line: str = "",earliest_send_key_monotonic_ns=0):
         earliest = self._last_send_monotonic_ns + _Mini_Key_Send_Span_ns
@@ -60,15 +59,46 @@ class JoyStick_HORI_S(JoyStick):
         t2 = time.monotonic_ns()
         # print((t2 - t1)/1000000,(t1 - earliest)/1000000,loop,input_line)
 
-    async def release(self,release_monotonic_ns:float = 0):
-        await self._send("",release_monotonic_ns)
-
     async def _key_press(self,  inputs = []):
         release_monotonic_ns = 0
         for input_line in inputs:
             await self._send(input_line[0],release_monotonic_ns)
             release_monotonic_ns = self._last_send_monotonic_ns + input_line[1]*1000000000
         await self.release(release_monotonic_ns)
+
+    async def _start_realtime_async(self):
+        async with self._realtime_data_lock:
+            self._realtime_action = ""
+        await self._send(self._realtime_action)
+        last_action = ""
+        last_action_monotonic = time.monotonic()
+        while self._is_realtime:
+            await asyncio.sleep_ms(int(_Mini_Key_Send_Span_ns/1000000))
+            action = None
+            if time.monotonic()-last_action_monotonic > 2:
+                last_action = "clear"
+            async with self._realtime_data_lock:
+                if self._realtime_action != last_action:
+                    action = self._realtime_action
+                    last_action = action
+                    last_action_monotonic = time.monotonic()
+            if action != None:
+                await self._send(action)
+        await self._send("")
+
+    async def _stop_realtime_async(self):
+        self._is_realtime = False
+        if not self._realtime_task:
+            return
+        await self._realtime_task
+        self._realtime_task = None
+
+    async def send_realtime_action(self,action:str):
+        async with self._realtime_data_lock:
+            self._realtime_action = action.strip()
+
+    async def release(self,release_monotonic_ns:float = 0):
+        await self._send("",release_monotonic_ns)
 
     async def do_action(self,  action_line: str = ""):
         inputs = []
@@ -93,7 +123,6 @@ class JoyStick_HORI_S(JoyStick):
             inputs.append((p1,p2))
         await self._key_press(inputs)
 
-
     def start_realtime(self):
         if self._realtime_task:
             return
@@ -102,36 +131,4 @@ class JoyStick_HORI_S(JoyStick):
 
     def stop_realtime(self):
         self._is_realtime = False
-        self._realtime_task = None
-
-    async def _start_realtime_async(self):
-        async with self._realtime_data_lock:
-            self._realtime_action = ""
-        await self._send(self._realtime_action)
-        last_action = ""
-        last_action_monotonic = time.monotonic()
-        while self._is_realtime:
-            await asyncio.sleep_ms(int(_Mini_Key_Send_Span_ns/1000000))
-            action = None
-            if time.monotonic()-last_action_monotonic > 2:
-                last_action = "clear"
-            async with self._realtime_data_lock:
-                if self._realtime_action != last_action:
-                    action = self._realtime_action
-                    last_action = action
-                    last_action_monotonic = time.monotonic()
-            if action != None:
-                await self._send(action)
-        await self._send("")
-
-
-    async def send_realtime_action(self,action:str):
-        async with self._realtime_data_lock:
-            self._realtime_action = action.strip()
-
-    async def _stop_realtime_async(self):
-        self._is_realtime = False
-        if not self._realtime_task:
-            return
-        await self._realtime_task
         self._realtime_task = None

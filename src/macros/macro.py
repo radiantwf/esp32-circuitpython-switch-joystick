@@ -19,8 +19,8 @@ class Macro(object):
     _first = True
 
     def __init__(self):
-        if self._first:
-            self._first = False
+        if Macro._first:
+            Macro._first = False
             self._publish = []
             self._default_paras = dict()
             self._dic_macros = self._get_macros()
