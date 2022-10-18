@@ -13,9 +13,11 @@ import customize.config as config
 
 def main():
     c = config.Config()
+    tm = task_manager.TaskManager()
+    joystick = hid.joystick.JoyStickFactory.get_instance()
+    tm.create_task(joystick.start())
     web_running = c.get("web-server.running")
     tcp_running = c.get("tcp-server.running")
-    tm = task_manager.TaskManager()
     web_running = type(web_running) is bool and web_running
     tcp_running = type(tcp_running) is bool and tcp_running
     if web_running or tcp_running:
@@ -43,8 +45,6 @@ def main():
     span = time.monotonic()
     if span < 15:
         time.sleep(15 - span)
-    joystick = hid.joystick.JoyStickFactory.get_instance()
-    tm.create_task(joystick.start())
     macros.action_queue_task_start()
     macros.auto_run()
 
