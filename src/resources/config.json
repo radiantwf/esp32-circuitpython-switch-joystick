@@ -1,25 +1,13 @@
 {
 	"wifi": {
-		"type": "wifi",
-		"ssid": "WangFeng",
+		"type": "ap",
+		"ssid": "esp32",
 		"pwd": "radiantwf",
 		"hostname": "ls2mini"
 	},
 	"wifi1": {
 		"type": "wifi",
 		"ssid": "WangFeng",
-		"pwd": "radiantwf",
-		"hostname": "ls2mini"
-	},
-	"wifi2": {
-		"type": "wifi",
-		"ssid": "NETGERR-JY",
-		"pwd": "19840618",
-		"hostname": "ls2mini"
-	},
-	"wifi3": {
-		"type": "ap",
-		"ssid": "esp32",
 		"pwd": "radiantwf",
 		"hostname": "ls2mini"
 	},
@@ -37,7 +25,7 @@
 		"running":false
 	},
 	"tcp-server": {
-		"running":true,
+		"running":false,
 		"port":5000
 	}
 }
