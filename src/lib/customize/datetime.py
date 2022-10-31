@@ -1,9 +1,4 @@
 import time
-import adafruit_ntp
-import wifi
-import socketpool
-import rtc
-
 
 def now():
     now = time.localtime()
@@ -14,6 +9,10 @@ def now():
 
 def ntpSync():
     try:
+        import wifi
+        import socketpool
+        import rtc
+        import adafruit_ntp
         ntp = adafruit_ntp.NTP(socketpool.SocketPool(
             wifi.radio), server='0.cn.pool.ntp.org', port=123, tz_offset=8)
         rtc.RTC().datetime = ntp.datetime

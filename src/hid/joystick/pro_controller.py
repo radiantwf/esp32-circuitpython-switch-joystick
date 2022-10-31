@@ -1,7 +1,6 @@
-from adafruit_hid import find_device
 from hid.joystick.input.pro_controller import JoyStickInput_PRO_CONTROLLER
 from hid.joystick.joystick import JoyStick
-import usb_hid
+import hid.device
 import time
 import asyncio
 _Min_Key_Send_Span_ns = 3 * 1000000
@@ -27,8 +26,8 @@ class JoyStick_PRO_CONTROLLER(JoyStick):
             self._action_lock = asyncio.Lock()
             self._action_line = ""
             self._last_key_press_ns = 0
-            self._joystick_device = find_device(
-                usb_hid.devices, usage_page=0x01, usage=0x04)
+            device = hid.device.get_device(hid.device.Device_Switch_Pro)
+            self._joystick_device = device.find_device()
 
     def _get_counter(self):
         return int((time.monotonic_ns() - self._start_ns) * 360 / 1000000000 ) & 0xff

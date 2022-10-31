@@ -1,4 +1,6 @@
 import usb_hid
+from adafruit_hid import find_device
+from hid.device import device
 
 Tag = "PRO CONTROLLER"
 
@@ -106,3 +108,19 @@ SwitchPro = usb_hid.Device(
     in_report_lengths=(63,63,63,0,0,0),
     out_report_lengths=(0,0,0,63,63,63),
 )
+
+class Device_Switch_Pro(device.Device):
+    def __init__(self):
+        super().__init__()
+
+    def init_device(self):
+        try:
+            import supervisor
+            supervisor.set_usb_identification("Nintendo Co., Ltd.","Pro Controller",0x057E,0x2009)
+        except:
+            pass
+        usb_hid.enable((SwitchPro,))
+
+    def find_device(self):
+        return find_device(
+            usb_hid.devices, usage_page=0x01, usage=0x04)

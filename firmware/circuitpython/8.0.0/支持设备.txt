@@ -1,0 +1,17 @@
+测试版本 8.0.0-beta.4
+
+直接使用circuitpython官方固件即可：
+https://circuitpython.org/downloads
+
+已测试设备：
+Raspberry Pi Pico
+https://circuitpython.org/board/raspberry_pi_pico/
+
+Raspberry Pi Pico W
+https://circuitpython.org/board/raspberry_pi_pico_w/
+
+ESP32S3-N16R8
+https://circuitpython.org/board/espressif_esp32s3_box/
+
+LOLIN S2 Mini
+https://circuitpython.org/board/lolin_s2_mini/

@@ -1,9 +1,8 @@
 import time
-from adafruit_hid import find_device
 import asyncio
 from hid.joystick.input.hori import JoyStickInput_HORI_S
 from hid.joystick.joystick import JoyStick
-import usb_hid
+import hid.device
 
 _Mini_Key_Send_Span_ns = 3000000
 
@@ -18,8 +17,8 @@ class JoyStick_HORI_S(JoyStick):
     def __init__(self):
         if JoyStick_HORI_S._first:
             JoyStick_HORI_S._first = False
-            self._joystick_device = find_device(
-                usb_hid.devices, usage_page=0x1, usage=0x05)
+            device = hid.device.get_device(hid.device.Device_HORIPAD_S)
+            self._joystick_device = device.find_device()
             self._last_send_monotonic_ns = 0
             self._realtime_data_lock = asyncio.Lock()
             self._is_realtime = False

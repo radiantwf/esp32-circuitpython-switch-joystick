@@ -45,6 +45,12 @@ A virtual HID USB joystick created using ESP32S2/S3
 
 #### 固件编译
 
+##### 8.0.0-beta.4 ~
+
+直接使用circuitpython官方固件即可，[固件下载链接](https://circuitpython.org/downloads)（<https://circuitpython.org/downloads>）。
+
+##### 7.3.3
+
 1. 设备OTG口连接PC，Windows与Mac都可
 
 2. 如果设备为 **EPS32S3-N16R8** 或 **LOLIN S2 Mini**，可直接使用**项目中打包好固件**，不需要自行编译，直接进行固件写入操作

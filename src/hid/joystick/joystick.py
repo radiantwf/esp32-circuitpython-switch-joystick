@@ -1,6 +1,9 @@
 class JoyStick:
     pass
 
+    async def start(self):
+        pass
+
     def start_realtime(self):
         pass
 

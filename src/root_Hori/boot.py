@@ -1,11 +1,16 @@
 import usb_hid
-import hid.device.hori
-import customize.wifi_connect as wifi_connect
+import hid.device
 import customize.datetime
-import wifi
 
-usb_hid.enable((hid.device.hori.HoriPadS,))
-wifi_connect.connect()
-print(wifi_connect.ip_address())
-print(wifi.radio.hostname)
-print(customize.datetime.ntpSync())
+device = hid.device.get_device(hid.device.Device_HORIPAD_S)
+device.init_device()
+try:
+    import wifi
+    import customize.wifi_connect as wifi_connect
+    wifi_connect.connect()
+    print(wifi_connect.ip_address())
+    print(wifi.radio.hostname)
+    print(customize.datetime.ntpSync())
+except:
+    pass
+

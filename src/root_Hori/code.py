@@ -1,22 +1,31 @@
-import hid.device.hori
 import hid.joystick
-hid.joystick.JoyStickFactory.get_instance(hid.device.hori.Tag)
+import hid.device
+device = hid.device.Device_HORIPAD_S
+hid.joystick.JoyStickFactory.get_instance(device)
 
 
 import macros
 import time
-import customize.wifi_connect as wifi_connect
 import customize.task_manager as task_manager
 import customize.config as config
 
 def main():
     c = config.Config()
-    web_running = c.get("web-server.running")
-    tcp_running = c.get("tcp-server.running")
     tm = task_manager.TaskManager()
+    joystick = hid.joystick.JoyStickFactory.get_instance()
+    tm.create_task(joystick.start())
+    web_running = False
+    tcp_running = False
+    try:
+        import wifi
+        web_running = c.get("web-server.running")
+        tcp_running = c.get("tcp-server.running")
+    except:
+        pass
     web_running = type(web_running) is bool and web_running
     tcp_running = type(tcp_running) is bool and tcp_running
     if web_running or tcp_running:
+        import customize.wifi_connect as wifi_connect
         for i in range(1,10):
             try:
                 wifi_connect.connect()

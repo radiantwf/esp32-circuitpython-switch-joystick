@@ -1,4 +1,6 @@
 import usb_hid
+from adafruit_hid import find_device
+from hid.device import device
 
 Tag = "HORIPAD S"
 
@@ -57,3 +59,19 @@ HoriPadS = usb_hid.Device(
     in_report_lengths=(8,),
     out_report_lengths=(0,),
 )
+
+class Device_Horipad_S(device.Device):
+    def __init__(self):
+        super().__init__()
+
+    def init_device(self):
+        try:
+            import supervisor
+            supervisor.set_usb_identification("HORI CO.,LTD.","HORIPAD S",0x0F0D,0x00C1)
+        except:
+            pass
+        usb_hid.enable((HoriPadS,))
+
+    def find_device(self):
+        return find_device(
+            usb_hid.devices, usage_page=0x01, usage=0x05)
