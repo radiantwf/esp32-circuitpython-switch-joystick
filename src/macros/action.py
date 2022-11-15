@@ -21,16 +21,13 @@ class Action(object):
         splits = action_line.split("]")
         key = splits[0][1:]
         times = 0
-        s1 = splits[1].split("?")
-        if len(s1) == 2:
-            if self._paras.get_bool(s1[1]):
+        if splits[1].startswith("?"):
+            if self._paras.get_bool(splits[1][1:]):
                 times = 1
+        elif splits[1].startswith("*"):
+            times = self._paras.get_int(splits[1][1:])
         else:
-            s2 = splits[1].split("*")
-            try:
-                times = self._paras.get_int(s2[1])
-            except:
-                times = 1
+            times = 1
         n = self._macro.get_node(key)
         node = n[0]
         if node.action != macro._FINISHED_LINE and times >= 1:
