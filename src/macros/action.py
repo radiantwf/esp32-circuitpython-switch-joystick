@@ -77,6 +77,14 @@ class Action(object):
                 for row in self._waiting_node:
                     self._body_waiting_node.append(row)
                 continue
+            elif line.startswith("EXEC>"):
+                self._paras.exec_str(line[5:])
+                self._current = self._current.next
+                self._return_jump()
+                if self._current.action == macro._FINISHED_LINE:
+                    return None, True
+                line = self._current.action
+                continue
             else:
                 break
         if self._current.action == macro._FINISHED_LINE:

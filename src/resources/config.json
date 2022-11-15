@@ -14,8 +14,8 @@
 	"macros": {
 		"autorun": {
 			"stop":false,
-			"name": "雷吉艾勒奇（定点）",
-			"loop": 99999999,
+			"name": "朱紫孵蛋",
+			"loop": 1,
 			"paras": {
 				"secondary": "False"
 			}

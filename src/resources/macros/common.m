@@ -25,6 +25,6 @@ A:0.1
 5
 
 --连续点击A--
-<press_button_a>
+<press_button_a|连续点击A>
 A:0.1
 0.2

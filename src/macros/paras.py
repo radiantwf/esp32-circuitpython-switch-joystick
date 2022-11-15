@@ -11,10 +11,18 @@ class Paras(object):
                 v = para[key]
                 if v != None and v != "":
                     self._paras[key] = v
+        locals().update(self._paras)
+
+    def exec_str(self,key):
+        try:
+            key = key.replace("|space|", " ", -1)
+            exec(key)
+        except:
+            return
 
     def get_bool(self,key)->bool:
-        locals().update(self._paras)
         try:
+            key = key.replace("|space|", " ", -1)
             v = eval(key)
         except:
             return False
@@ -27,8 +35,8 @@ class Paras(object):
         return False
     
     def get_int(self,key)->int:
-        locals().update(self._paras)
         try:
+            key = key.replace("|space|", " ", -1)
             v = eval(key)
         except:
             return 0
