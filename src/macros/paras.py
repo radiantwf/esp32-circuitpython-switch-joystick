@@ -40,5 +40,5 @@ class Paras(object):
         elif (type(v) is float):
             return int(v)
         elif (type(v) is str):
-            int(float(v))
+            return int(float(v))
         return 0
