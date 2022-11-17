@@ -13,4 +13,7 @@ def mem_free():
 
 def cpu_temperature():
     import microcontroller
-    return microcontroller.cpu.temperature
+    try:
+        return microcontroller.cpu.temperature
+    except:
+        return 0

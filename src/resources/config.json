@@ -7,25 +7,12 @@
 	},
 	"wifi1": {
 		"type": "wifi",
-		"ssid": "WangFeng",
-		"pwd": "radiantwf",
+		"ssid": "test",
+		"pwd": "test",
 		"hostname": "ls2mini"
 	},
-	"macros": {
-		"autorun": {
-			"stop":false,
-			"name": "朱紫孵蛋",
-			"loop": 1,
-			"paras": {
-				"secondary": "False"
-			}
-		}
-	},
-	"web-server": {
-		"running":false
-	},
 	"tcp-server": {
-		"running":false,
+		"running":true,
 		"port":5000
 	}
 }

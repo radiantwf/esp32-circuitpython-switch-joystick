@@ -59,11 +59,16 @@ class JoyStick_HORI_S(JoyStick):
         # print((t2 - t1)/1000000,(t1 - earliest)/1000000,loop,input_line)
 
     async def _key_press(self,  inputs = []):
+        last_action = ""
         release_monotonic_ns = 0
         for input_line in inputs:
+            last_action = input_line
+            if input_line == "~":
+                continue
             await self._send(input_line[0],release_monotonic_ns)
             release_monotonic_ns = self._last_send_monotonic_ns + input_line[1]*1000000000
-        await self.release(release_monotonic_ns)
+        if last_action != "~":
+            await self.release(release_monotonic_ns)
 
     async def _start_realtime_async(self):
         async with self._realtime_data_lock:

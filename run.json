@@ -1,0 +1,36 @@
+[
+	{"stop" : true},
+	{
+		"stop" : true,
+		"name": "朱紫野餐",
+		"loop": 1,
+		"paras": {
+			"secondary": "False",
+			"get_eggs_times": 15
+		}
+	},
+	{
+		"stop" : true,
+		"name": "朱紫孵蛋",
+		"loop": 1,
+		"paras": {
+			"secondary": "False",
+			"start_col": 0,
+			"last_col": 5,
+			"last_page": 0,
+			"cycles": 20,
+			"flame_body": "True"
+		}
+	},
+	{
+		"stop" : true,
+		"name": "朱紫放生",
+		"loop": 1,
+		"paras": {
+			"secondary": "False",
+			"start_col": 3,
+			"last_col": 3,
+			"last_page": 1
+		}
+	}
+]

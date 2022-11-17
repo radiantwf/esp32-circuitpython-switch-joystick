@@ -237,10 +237,15 @@ class JoyStick_PRO_CONTROLLER(JoyStick):
 
     async def _key_press(self,  inputs = []):
         release_monotonic_ns = 0
+        last_action = ""
         for input_line in inputs:
+            last_action = input_line
+            if input_line == "~":
+                continue
             await self._send(input_line[0],release_monotonic_ns)
             release_monotonic_ns = self._last_key_press_ns + input_line[1]*1000000000
-        await self.release(release_monotonic_ns)
+        if last_action != "~":
+            await self.release(release_monotonic_ns)
 
     async def release(self,release_monotonic_ns:float = 0):
         await self._send("",release_monotonic_ns)
