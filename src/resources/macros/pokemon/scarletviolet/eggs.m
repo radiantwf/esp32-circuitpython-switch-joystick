@@ -113,18 +113,21 @@ B:0.05
 B:0.05
 0.7
 
+
+
+
 --朱紫野餐取蛋--
 <get_eggs|朱紫野餐|1--get_eggs_times|取蛋次数（每次等待2分钟）|15>
 [pokemon.scarletviolet.common.restart_game]
 X:0.1
 0.8
-body:
 LStick@127,0:0.05
 0.1
 LStick@0,127:0.05
 0.1
 LStick@0,127:0.05
 0.1
+body:
 A:0.1
 0.1
 9
@@ -135,6 +138,7 @@ A:0.1
 0.5
 A:0.1
 5
+# 选择超级花生酱三明治（配方：香蕉，花生酱，黄油 各1）
 LStick@127,0:0.05
 0.3
 LStick@0,127:0.05
@@ -179,18 +183,21 @@ LStick@127,0:0.4->LStick@0,-127:0.4->LStick@-127,0:0.16
 	}*4
 	0.5
 }*int(get_eggs_times)
-0.5
+1
 Y:0.05
-0.3
+0.5
 A:0.05
-0.3
+0.5
+A:0.05
 2.5
 {
-	A:0.05
+	B:0.05
 	0.1
 }*10
 X:0.1
 0.8
+
+
 
 --朱紫放生--
 <release_pokemons|朱紫放生|1--start_col|起始列(0-5)|0--last_col|终止列(0-5)|5--last_page|终止页面(0为当前页面)|0>
@@ -214,14 +221,14 @@ A:0.05
 		R:0.05
 		0.7
 		LStick@127,0:0.05
-		0.1
+		0.2
 		EXEC>current_col=0
 		EXEC>current_page=current_page+1
 	}?current_col>5
 	[release_a_pokemon]
 	{
 		LStick@0,127:0.05
-		0.1
+		0.2
 		[release_a_pokemon]
 	}*4
 	{
@@ -238,6 +245,7 @@ B:0.05
 1.5
 B:0.05
 0.7
+
 
 
 --放生1只精灵--

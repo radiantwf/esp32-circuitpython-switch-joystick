@@ -1,0 +1,19 @@
+nc -v 192.168.50.120 5000
+
+// 停止脚本
+{ "stop" : true }
+
+{ "stop" : true, "name": "common.wakeup_joystick" }
+
+
+
+// 朱紫野餐取蛋
+{ "stop" : true, "name": "朱紫野餐", "loop": 1, "paras": { "secondary": "False", "get_eggs_times": 15 } }
+
+// 朱紫孵蛋
+{ "stop" : true, "name": "朱紫孵蛋", "loop": 1, "paras": { "secondary": "False", "start_col": 0, "last_col": 2, "last_page": 1, "cycles": 20, "flame_body": "True" } }
+
+// 朱紫放生
+{ "stop" : true, "name": "朱紫放生", "loop": 1, "paras": { "secondary": "False", "start_col": 0, "last_col": 1, "last_page": 5 } }
+
+{ "stop" : true, "name": "连续点击A" }
