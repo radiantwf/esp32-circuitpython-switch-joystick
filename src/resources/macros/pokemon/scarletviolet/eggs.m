@@ -202,8 +202,8 @@ X:0.1
 --朱紫放生--
 <release_pokemons|朱紫放生|1--start_col|起始列(0-5)|0--last_col|终止列(0-5)|5--last_page|终止页面(0为当前页面)|0>
 body:
-EXEC>current_page=0;current_col=start_col;
-EXEC>loop_times=last_page*6+last_col-start_col+1
+EXEC>current_page=0;current_col=int(start_col);
+EXEC>loop_times=int(last_page)*6+int(last_col)-int(start_col)+1
 
 # 打开盒子
 X:0.05
