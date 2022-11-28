@@ -9,7 +9,7 @@
 		"autorun": {
 			"stop":false,
 			"name": "连续点击A",
-			"loop": 1,
+			"loop": -1,
 			"paras": {
 				"secondary": "False"
 			}
