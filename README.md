@@ -161,3 +161,7 @@ A virtual HID USB joystick created using ESP32S2/S3
 #### 开发笔记（不定期更新）
 
 [跳转](./NOTE.md)
+
+#### 特别感谢
+
+- 燃烧の小宇宙 提供朱紫无限复制道具（1.01版BUG)脚本
