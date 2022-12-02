@@ -15,6 +15,12 @@ A virtual HID USB joystick created using ESP32S2/S3/RP2040
 
 <img src="imgs/devices.jpg" style="zoom: 25%;" />
 
+## 常见问题汇总
+
+[跳转](./SCRIPTS.md)
+
+使用前请一定要看一下
+
 ## 功能
 
 1. 模拟NS手柄，控制NS主机
