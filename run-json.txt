@@ -6,6 +6,9 @@ nc -v 192.168.50.120 5000
 { "stop" : true, "name": "common.wakeup_joystick" }
 
 
+// -----------注意事项：---------------
+// 在配置启动参数时，所有的 "stop" : true 修改为 "stop" : false
+
 
 // 朱紫野餐取蛋
 // 注意事项：

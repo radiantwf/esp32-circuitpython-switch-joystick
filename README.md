@@ -1,14 +1,15 @@
 # esp32-circuitpython-switch-joystick
 
-A virtual HID USB joystick created using ESP32S2/S3
+A virtual HID USB joystick created using ESP32S2/S3/RP2040
 
 ## 硬件需求
 
 1. Switch主机 * 1
-2. ESP32S2/ESP32S3（需要有USB-OTG接口）开发板 * 1  （价格：12.5~70元，自行选购）
+2. ESP32S2/ESP32S3/RP2040开发板 * 1
    - 本人测试用设备：
-   - LOLIN S2 Mini：ESP32S2芯片，单核240MHz，N4R2    12.5元
+   - LOLIN S2 Mini：ESP32S2芯片，单核240MHz，N4R2    12.5元   <font color=red>注意近期有10%左右的网友无法刷入circuitpython官方固件，猜测可能是模块问题，如果担心设备问题，尽量选择Raspberry Pi Pico</font>
    - ESP32-S3-DevKitC-1-N16R8：ESP32S3芯片，双核240MHz，N16R8，支持蓝牙    59元
+   - Raspberry Pi Pico (W): 带W版本 包含网络模块 51元，不带W 25元
    - 由于我希望降低大家的使用成本，后续的研发，测试，我将在LOLIN S2 Mini上进行
 3. USB线（连接主机与开发板） * 1
 
@@ -19,7 +20,7 @@ A virtual HID USB joystick created using ESP32S2/S3
 1. 模拟NS手柄，控制NS主机
 2. 支持自定义宏脚本，实现游戏自动化
 3. 内部集成部分宝可梦剑盾功能的宏脚本
-4. HTTP WEB管理基本功能
+4. TCP管理基本功能
 
 ## 预计追加功能
 
@@ -142,9 +143,7 @@ A virtual HID USB joystick created using ESP32S2/S3
 
 ## 远程管理
 
-采用HTTP方式进行管理
-
-<img src="imgs/http.png"/>
+采用TCP方式进行管理，默认开启5000端口
 
 ### 运行效果
 
