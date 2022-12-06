@@ -50,28 +50,34 @@ A:0.05
 	0.7
 
 	L:0.05
-	1
+	0.6
+	LPRESS:0.01
+	LPRESS:0.01
 	{
-		LStick@-0,-127|RStick@-127,0:0.5->LStick@-0,-127|RStick@-127,0|LPRESS:0.1->LStick@-0,-127|RStick@-127,0:5.4->~
+		LPRESS|LStick@-127,0|RStick@-127,0:6.8->~
 	}*int((cycles+4)/5)
+	1
 	{
 		B:0.1
 		0.1
-	}*100
+	}*90
 	4
 	{
 		L:0.05
-		1
+		0.6
+		LPRESS:0.01
+		LPRESS:0.01
 		{
-			LStick@-0,-127|RStick@-127,0:0.5->LStick@-0,-127|RStick@-127,0|LPRESS:0.1->LStick@-0,-127|RStick@-127,0:12->~
+			LPRESS|LStick@-127,0|RStick@-127,0:12->~
 		}flame_body
 		{
-			LStick@-0,-127|RStick@-127,0:0.5->LStick@-0,-127|RStick@-127,0|LPRESS:0.1->LStick@-0,-127|RStick@-127,0:20->~
+			LPRESS|LStick@-127,0|RStick@-127,0:20->~
 		}?not|space|flame_body
+		1
 		{
 			B:0.1
 			0.1
-		}*100
+		}*90
 		4
 	}*4
 
@@ -139,12 +145,10 @@ A:0.1
 A:0.1
 5
 # 选择超级花生酱三明治（配方：香蕉，花生酱，黄油 各1）
-LStick@127,0:0.05
-0.3
-LStick@0,127:0.05
-0.3
-LStick@0,127:0.05
-0.3
+{
+	LStick@0,127:0.05
+	0.3
+}*7
 A:0.1
 0.7
 A:0.1
@@ -184,8 +188,10 @@ LStick@127,0:0.4->LStick@0,-127:0.4->LStick@-127,0:0.16
 	0.5
 }*int(get_eggs_times)
 1
-Y:0.05
-0.5
+{
+	Y:0.05
+	0.5
+}*3
 A:0.05
 0.5
 A:0.05
@@ -194,6 +200,8 @@ A:0.05
 	B:0.05
 	0.1
 }*10
+L:0.05
+1
 X:0.1
 0.8
 
