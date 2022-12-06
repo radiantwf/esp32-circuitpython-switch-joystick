@@ -51,10 +51,8 @@ A:0.05
 
 	L:0.05
 	0.6
-	LPRESS:0.01
-	LPRESS:0.01
 	{
-		LPRESS|LStick@-127,0|RStick@-127,0:6.8->~
+		LStick@-0,-127|RStick@-127,0:0.5->LStick@-0,-127|RStick@-127,0|LPRESS:0.1->LStick@-0,-127|RStick@-127,0:5.4->~
 	}*int((cycles+4)/5)
 	1
 	{
@@ -68,10 +66,10 @@ A:0.05
 		LPRESS:0.01
 		LPRESS:0.01
 		{
-			LPRESS|LStick@-127,0|RStick@-127,0:12->~
+			LStick@-0,-127|RStick@-127,0:0.5->LStick@-0,-127|RStick@-127,0|LPRESS:0.1->LStick@-0,-127|RStick@-127,0:12->~
 		}flame_body
 		{
-			LPRESS|LStick@-127,0|RStick@-127,0:20->~
+			LStick@-0,-127|RStick@-127,0:0.5->LStick@-0,-127|RStick@-127,0|LPRESS:0.1->LStick@-0,-127|RStick@-127,0:20->~
 		}?not|space|flame_body
 		1
 		{
@@ -148,7 +146,7 @@ A:0.1
 {
 	LStick@0,127:0.05
 	0.3
-}*7
+}*8
 A:0.1
 0.7
 A:0.1
