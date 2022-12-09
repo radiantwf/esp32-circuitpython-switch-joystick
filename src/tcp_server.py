@@ -2,7 +2,7 @@ import io
 import macros
 import time
 import asyncio
-from errno import EAGAIN
+from errno import EAGAIN,ENOTCONN
 import wifi
 import socketpool
 import customize.wifi_connect as wifi_connect
@@ -43,7 +43,7 @@ class TcpServer(object):
         print("Starting TCP Server socket")
         pool = socketpool.SocketPool(wifi.radio)
         self._socket = pool.socket(pool.AF_INET, pool.SOCK_STREAM)
-        self._socket.settimeout(0)
+        self._socket.setblocking(False)
         self._socket.bind((str(HOST), port))
         self._socket.listen(1000)
 
@@ -63,7 +63,7 @@ class TcpServer(object):
                         raise e
                 if client != None:
                     self._clients.append(client)
-                    client.settimeout(0)
+                    client.setblocking(False)
                     tm.create_task(self.tcp_handler(client))
             except OSError as e:
                 if client != None:
@@ -87,6 +87,15 @@ class TcpServer(object):
                     except OSError as e:
                         if e.errno == EAGAIN:
                             break
+                        elif e.errno == ENOTCONN:
+                            data = bytes_io.getvalue()
+                            bytes_io.close()
+                            if len(data) > 0 :
+                                last_active_ts = time.monotonic()
+                                data = data.decode('utf-8')
+                                ret = macros.add_joystick_task(data)
+                            self._clients.remove(client_socket)
+                            return
                         raise e
                 data = bytes_io.getvalue()
                 bytes_io.close()
