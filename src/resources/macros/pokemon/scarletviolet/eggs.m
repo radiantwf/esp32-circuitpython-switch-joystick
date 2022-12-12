@@ -237,18 +237,19 @@ A:0.05
 		EXEC>current_col=0
 		EXEC>current_page=current_page+1
 	}?current_col>5
+	0.4
 	[release_a_pokemon]
 	{
 		LStick@0,127:0.05
-		0.2
+		0.4
 		[release_a_pokemon]
 	}*4
 	{
 		LStick@0,127:0.05
-		0.1
+		0.2
 	}*3
 	LStick@127,0:0.05
-	0.1
+	0.4
 	EXEC>current_col=current_col+1
 }*loop_times
 
@@ -263,8 +264,8 @@ A:0.05
 
 --放生1只精灵--
 <release_a_pokemon>
-A:0.1
-0.5
+A:0.01->0.008->A:0.05
+0.8
 LStick@0,-127:0.05
 0.1
 LStick@0,-127:0.05
