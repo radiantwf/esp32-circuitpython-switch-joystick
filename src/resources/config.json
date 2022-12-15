@@ -15,6 +15,9 @@
 			}
 		}
 	},
+	"web-server": {
+		"running":false
+	},
 	"tcp-server": {
 		"running":false,
 		"port":5000

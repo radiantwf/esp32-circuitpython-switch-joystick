@@ -120,7 +120,7 @@ def _create_task_json(cmd: dict):
 def published():
     m= macro.Macro()
     if m._publish!= None:
-        return json.dumps(m._publish)
+        return json.dumps(m._publish, separators=(',', ':'))
     else:
         return ""
 

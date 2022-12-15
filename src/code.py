@@ -14,14 +14,17 @@ def main():
     tm = task_manager.TaskManager()
     joystick = hid.joystick.JoyStickFactory.get_instance()
     tm.create_task(joystick.start())
+    web_running = False
     tcp_running = False
     try:
         import wifi
+        web_running = c.get("web-server.running")
         tcp_running = c.get("tcp-server.running")
     except:
         pass
+    web_running = type(web_running) is bool and web_running
     tcp_running = type(tcp_running) is bool and tcp_running
-    if tcp_running:
+    if web_running or tcp_running:
         import customize.wifi_connect as wifi_connect
         for i in range(1,10):
             try:
@@ -31,6 +34,9 @@ def main():
                 if i>=5:
                     raise
         print(wifi_connect.ip_address())
+        if web_running:
+            import http_server as http
+            tm.create_task(http.serve(), "")
         if tcp_running:
             from tcp_server import TcpServer
             port = 5000

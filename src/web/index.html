@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+	<title>ESP32手柄控制</title>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<!-- <script type="text/javascript" src="jquery-3.6.1.min.js"></script> -->
+</head>
+
+<body>
+	<style type="text/css">
+		div {
+			padding: 15px;
+		}
+
+		div.para_item {
+			padding: 0;
+		}
+
+		div.para_span {
+			padding: 0;
+		}
+
+		div.para_value {
+			padding: 0;
+		}
+
+		div.no_padding {
+			padding: 0px;
+		}
+
+		div.div_status {
+			height: 150px;
+			white-space: pre-wrap;
+			border: 1px;
+			border-color: black;
+		}
+
+		div.macro {
+			display: flex;
+			float: right;
+			align-items: baseline;
+		}
+
+		a {
+			color: blue;
+			float: right;
+			padding-right: 5px;
+			font-size: 26px;
+		}
+
+		a.a_macro_stop {
+			color: red;
+			font-size: 22px;
+		}
+
+		textarea {
+			font-size: 20px;
+			width: 100%;
+			height: 80px;
+			resize: none;
+			overflow: auto;
+		}
+
+		ul {
+			list-style: none;
+			display: inline-block;
+			width: 100%;
+			margin-top: 2px;
+			margin-bottom: 3px;
+			padding: 0;
+		}
+
+		li {
+			display: block;
+			float: left;
+			margin: 0;
+			padding: 0;
+		}
+
+		li.para_item {
+			width: 40%;
+		}
+
+		li.para_span {
+			width: 5%;
+		}
+
+		li.para_value {
+			width: 45%;
+		}
+
+		select {
+			pad: 0;
+			width: 100%;
+		}
+
+		input {
+			pad: 0;
+			width: 100%;
+			border: 2;
+			display: block;
+		}
+
+		span {
+			float: left;
+			display: block;
+		}
+
+		span.para_span {
+			width: 100%;
+		}
+
+		span.button_span {
+			width: 60px;
+		}
+	</style>
+	<h1 align="center">ESP32手柄控制</h1>
+	<div>
+		<div class="status_label div_status no_padding">
+		</div>
+		<br />
+		<a class="a_status" href="javascript:void(0)">刷新</a>
+		<br />
+	</div>
+
+	<div>
+		<ul>
+			<li class="para_item">
+				<div class="para_item">脚本选择</div>
+			</li>
+			<li class="para_span"><span class="para_span">&nbsp;</span></li>
+			<li class="para_value">
+				<div class="para_value"><select class="macros">
+					</select></div>
+			</li>
+		</ul>
+		<ul>
+			<li class="para_item">
+				<div class="para_item">循环次数</div>
+			</li>
+			<li class="para_span"><span class="para_span">&nbsp;</span></li>
+			<li class="para_value">
+				<div class="para_value"><input class="loop" type="number" /></div>
+			</li>
+		</ul>
+		<div class="no_padding paras">
+		</div>
+		<!-- <textarea row=1 class="cmd"></textarea> -->
+		<br />
+		<div class="no_padding macro">
+			<a class="a_macro_stop" href="javascript:void(0)">停止所有脚本</a>
+			<span class="button_span"></span>
+			<a class="a_macro_run" href="javascript:void(0)">运行</a>
+		</div>
+	</div>
+
+	<script>
+		function init() {
+			$('input.loop').val("");
+			$('div.paras').empty();
+			$('select.macros').empty();
+		}
+
+		function get_macros() {
+			$.ajax({
+				type: "GET",
+				url: "/macro/published",
+				success: function (result) {
+					var obj = JSON.parse(result);
+					if (obj && typeof (obj) != "undefined" && typeof (obj) != "string" && obj != 0 && obj.length >
+						0) {
+						for (var k in obj) {
+							macros[obj[k]["summary"]] = obj[k];
+						}
+					}
+					display_select_option_elements();
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('.status_label').text(thrownError.message);
+					setTimeout("get_macros()", 1000);
+				}
+			});
+		}
+
+		function display_select_option_elements() {
+			$('select.macros').change(null);
+			$('select.macros').empty();
+			var strSource = ""
+			for (var name in macros) {
+				$('select.macros').append(new Option(name, name));
+			}
+			display_paras_elements();
+			$('select.macros').change(display_paras_elements);
+		}
+
+		function display_paras_elements() {
+			$('div.paras').empty();
+			var s = $('select.macros').val();
+			if (!s || typeof (s) == "undefined" || s == "") {
+				$('input.loop').val("");
+				return;
+			}
+
+			$('input.loop').val(macros[s]["loop"]);
+			var paras = macros[s]["paras"];
+			if (!paras || typeof (paras) == "undefined" || s.length <= 0) {
+				return;
+			}
+			for (var p in paras) {
+				$('div.paras').append("<ul id= \"ul_para" + p.toString() + "\"></ul>");
+				$("#ul_para" + p.toString()).append("<li id= \"li1_para" + p.toString() +
+					"\" class=\"para_item\"></li>");
+				$("#li1_para" + p.toString()).append("<div id= \"div1_para" + p.toString() +
+					"\" class=\"para_item\"></div>");
+				$("#div1_para" + p.toString()).text(paras[p]["summary"]);
+				$("#ul_para" + p.toString()).append("<li id= \"li2_para" + p.toString() +
+					"\" class=\"para_span\"><span class=\"para_span\">&nbsp;</span></li>");
+
+				$("#ul_para" + p.toString()).append("<li id= \"li3_para" + p.toString() +
+					"\" class=\"para_value\"></li>");
+				$("#li3_para" + p.toString()).append("<input id= \"input3_para" + p.toString() +
+					"\" class=\"para_value\" type=\"text\" />");
+				$("#input3_para" + p.toString()).val(paras[p]["default"]);
+			}
+		}
+
+		function get_device_status() {
+			$.ajax({
+				type: "GET",
+				url: "/status",
+				success: function (result) {
+					$('.status_label').text(result);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('.status_label').text(thrownError.message);
+				}
+			});
+		}
+		function get_device_status_loop() {
+			get_device_status();
+			setTimeout("get_device_status_loop()", 10000);
+		}
+		var macros = {};
+		init();
+		get_macros();
+
+		setTimeout("get_device_status_loop()", 100);
+		$('.a_status').click(get_device_status);
+		$('.a_macro_stop').click(function () {
+			if (confirm("是否确定停止运行中脚本？")) {
+				$.ajax({
+					type: "GET",
+					url: "/macro/stop",
+					success: function (result) {
+						$('.status_label').text(result);
+						setTimeout("get_device_status()", 1000);
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						$('.status_label').text(thrownError.message);
+						setTimeout("get_device_status()", 1000);
+					}
+				});
+			}
+		});
+		$('.a_macro_run').click(function () {
+			var data = {};
+			name = $('select.macros').val();
+			if (!name || typeof (name) == "undefined" || name == "") {
+				$('.status_label').text("选择的脚本错误，请重新选择脚本");
+				return;
+			}
+			data["name"] = name;
+			data["loop"] = Number($('input.loop').val());
+			var paras = {};
+			for (var p in macros[name]["paras"]) {
+				para = {};
+				para[macros[name]["paras"][p]["name"]] = $("#input3_para" + p.toString()).val();
+				paras[p] = para
+			}
+			data["paras"] = paras;
+			$.ajax({
+				type: "POST",
+				url: "/macro/start",
+				contentType: "application/json;charset=utf-8",
+				data: JSON.stringify(data),
+				success: function (result) {
+					$('.status_label').text(result);
+					setTimeout("get_device_status()", 1000);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('.status_label').text(thrownError.message);
+					setTimeout("get_device_status()", 1000);
+				}
+			});
+		});
+	</script>
+</body>
+
+</html>
