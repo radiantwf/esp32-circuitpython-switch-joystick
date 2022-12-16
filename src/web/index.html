@@ -276,9 +276,7 @@
 			data["loop"] = Number($('input.loop').val());
 			var paras = {};
 			for (var p in macros[name]["paras"]) {
-				para = {};
-				para[macros[name]["paras"][p]["name"]] = $("#input3_para" + p.toString()).val();
-				paras[p] = para
+				paras[macros[name]["paras"][p]["name"]] = $("#input3_para" + p.toString()).val();
 			}
 			data["paras"] = paras;
 			$.ajax({
