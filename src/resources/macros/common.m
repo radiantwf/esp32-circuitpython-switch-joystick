@@ -28,3 +28,8 @@ A:0.1
 <press_button_a|连续点击A>
 A:0.1
 0.2
+
+--连续点击B--
+<press_button_b|连续点击B>
+B:0.1
+0.2

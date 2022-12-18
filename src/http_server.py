@@ -20,7 +20,7 @@ async def serve():
     while True:
         try:
             _server.poll()
-            await asyncio.sleep_ms(1)
+            await asyncio.sleep_ms(50)
         except OSError:
             continue
 
