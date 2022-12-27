@@ -53,6 +53,17 @@ class HTTPServer:
                 print("Received a request of length", len(raw_text), "bytes")
                 return HTTPResponse(body="hello world")
 
+
+            @server.route(path, method)
+            def route_func(request, conn):
+                raw_text = request.raw_request.decode("utf8")
+                print("Received a request of length", len(raw_text), "bytes")
+                res = HTTPResponse(content_type="text/html")
+                res.send_chunk_headers(conn)
+                res.send_body_chunk(conn, "Some content")
+                res.send_body_chunk(conn, "Some more content")
+                res.send_body_chunk(conn, "")  # Send empty packet to finish chunked stream
+                return None  # Return None, so server knows that nothing else needs to be sent.
         """
 
         def route_decorator(func: Callable) -> Callable:
@@ -162,12 +173,18 @@ class HTTPServer:
 
                 # If a handler for route exists and is callable, call it.
                 if handler is not None and callable(handler):
-                    response = handler(request)
+                    # Need to pass connection for chunked encoding to work.
+                    try:
+                        response = handler(request, conn)
+                    except TypeError:
+                        response = handler(request)
+                    if response is None:
+                        return
 
                 # If no handler exists and request method is GET, try to serve a file.
                 elif request.method == HTTPMethod.GET:
                     response = HTTPResponse(
-                        filename=request.path, root_path=self.root_path
+                        filename=request.path, root_path=self.root_path, cache=604800
                     )
 
                 # If no handler exists and request method is not GET, return 400 Bad Request.
