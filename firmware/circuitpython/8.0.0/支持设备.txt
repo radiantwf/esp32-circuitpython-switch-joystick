@@ -11,7 +11,7 @@ Raspberry Pi Pico W
 https://circuitpython.org/board/raspberry_pi_pico_w/
 
 ESP32S3-N16R8
-https://circuitpython.org/board/espressif_esp32s3_box/
+https://circuitpython.org/board/yd_esp32_s3_n16r8/
 
 LOLIN S2 Mini
 https://circuitpython.org/board/lolin_s2_mini/

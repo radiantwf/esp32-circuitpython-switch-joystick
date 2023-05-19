@@ -8,15 +8,34 @@
 """
 
 try:
-    from typing import Dict, Tuple
+    from typing import Dict, Tuple, Union
+    from socket import socket
+    from socketpool import SocketPool
 except ImportError:
     pass
+
+from .headers import HTTPHeaders
 
 
 class HTTPRequest:
     """
     Incoming request, constructed from raw incoming bytes.
     It is passed as first argument to route handlers.
+    """
+
+    connection: Union["SocketPool.Socket", "socket.socket"]
+    """
+    Socket object usable to send and receive data on the connection.
+    """
+
+    client_address: Tuple[str, int]
+    """
+    Address and port bound to the socket on the other end of the connection.
+
+    Example::
+
+            request.client_address
+            # ('192.168.137.1', 40684)
     """
 
     method: str
@@ -39,26 +58,26 @@ class HTTPRequest:
     http_version: str
     """HTTP version, e.g. "HTTP/1.1"."""
 
-    headers: Dict[str, str]
+    headers: HTTPHeaders
     """
-    Headers from the request as `dict`.
-
-    Values should be accessed using **lower case header names**.
-
-    Example::
-
-            request.headers
-            # {'connection': 'keep-alive', 'content-length': '64' ...}
-            request.headers["content-length"]
-            # '64'
-            request.headers["Content-Length"]
-            # KeyError: 'Content-Length'
+    Headers from the request.
     """
 
     raw_request: bytes
-    """Raw bytes passed to the constructor."""
+    """
+    Raw 'bytes' passed to the constructor and body 'bytes' received later.
 
-    def __init__(self, raw_request: bytes = None) -> None:
+    Should **not** be modified directly.
+    """
+
+    def __init__(
+        self,
+        connection: Union["SocketPool.Socket", "socket.socket"],
+        client_address: Tuple[str, int],
+        raw_request: bytes = None,
+    ) -> None:
+        self.connection = connection
+        self.client_address = client_address
         self.raw_request = raw_request
 
         if raw_request is None:
@@ -114,18 +133,20 @@ class HTTPRequest:
             if "=" in query_param:
                 key, value = query_param.split("=", 1)
                 query_params[key] = value
-            else:
+            elif query_param:
                 query_params[query_param] = ""
 
         return method, path, query_params, http_version
 
     @staticmethod
-    def _parse_headers(header_bytes: bytes) -> Dict[str, str]:
+    def _parse_headers(header_bytes: bytes) -> HTTPHeaders:
         """Parse HTTP headers from raw request."""
         header_lines = header_bytes.decode("utf8").splitlines()[1:]
 
-        return {
-            name.lower(): value
-            for header_line in header_lines
-            for name, value in [header_line.split(": ", 1)]
-        }
+        return HTTPHeaders(
+            {
+                name: value
+                for header_line in header_lines
+                for name, value in [header_line.split(": ", 1)]
+            }
+        )

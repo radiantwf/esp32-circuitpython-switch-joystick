@@ -19,5 +19,5 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 """
 
-__version__ = "0.0.0+auto.0"
+__version__ = "3.0.2"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_HTTPServer.git"

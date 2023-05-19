@@ -39,6 +39,9 @@ class CommonHTTPStatus(HTTPStatus):  # pylint: disable=too-few-public-methods
     BAD_REQUEST_400 = HTTPStatus(400, "Bad Request")
     """400 Bad Request"""
 
+    FORBIDDEN_403 = HTTPStatus(403, "Forbidden")
+    """403 Forbidden"""
+
     NOT_FOUND_404 = HTTPStatus(404, "Not Found")
     """404 Not Found"""
 

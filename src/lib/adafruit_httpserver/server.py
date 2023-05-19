@@ -16,70 +16,62 @@ except ImportError:
 
 from errno import EAGAIN, ECONNRESET, ETIMEDOUT
 
+from .exceptions import FileNotExistsError, InvalidPathError
 from .methods import HTTPMethod
 from .request import HTTPRequest
 from .response import HTTPResponse
-from .route import _HTTPRoute
+from .route import _HTTPRoutes, _HTTPRoute
 from .status import CommonHTTPStatus
 
 
 class HTTPServer:
     """A basic socket-based HTTP server."""
 
-    def __init__(self, socket_source: Protocol) -> None:
+    def __init__(self, socket_source: Protocol, root_path: str) -> None:
         """Create a server, and get it ready to run.
 
         :param socket: An object that is a source of sockets. This could be a `socketpool`
           in CircuitPython or the `socket` module in CPython.
+        :param str root_path: Root directory to serve files from
         """
         self._buffer = bytearray(1024)
         self._timeout = 1
-        self.route_handlers = {}
+        self.routes = _HTTPRoutes()
         self._socket_source = socket_source
         self._sock = None
-        self.root_path = "/"
+        self.root_path = root_path
 
-    def route(self, path: str, method: HTTPMethod = HTTPMethod.GET):
-        """Decorator used to add a route.
+    def route(self, path: str, method: HTTPMethod = HTTPMethod.GET) -> Callable:
+        """
+        Decorator used to add a route.
 
-        :param str path: filename path
+        :param str path: URL path
         :param HTTPMethod method: HTTP method: HTTPMethod.GET, HTTPMethod.POST, etc.
 
         Example::
 
-            @server.route(path, method)
+            @server.route("/example", HTTPMethod.GET)
             def route_func(request):
-                raw_text = request.raw_request.decode("utf8")
-                print("Received a request of length", len(raw_text), "bytes")
-                return HTTPResponse(body="hello world")
+                ...
 
-
-            @server.route(path, method)
-            def route_func(request, conn):
-                raw_text = request.raw_request.decode("utf8")
-                print("Received a request of length", len(raw_text), "bytes")
-                res = HTTPResponse(content_type="text/html")
-                res.send_chunk_headers(conn)
-                res.send_body_chunk(conn, "Some content")
-                res.send_body_chunk(conn, "Some more content")
-                res.send_body_chunk(conn, "")  # Send empty packet to finish chunked stream
-                return None  # Return None, so server knows that nothing else needs to be sent.
+            @server.route("/example/<my_parameter>", HTTPMethod.GET)
+            def route_func(request, my_parameter):
+                ...
         """
 
         def route_decorator(func: Callable) -> Callable:
-            self.route_handlers[_HTTPRoute(path, method)] = func
+            self.routes.add(_HTTPRoute(path, method), func)
             return func
 
         return route_decorator
 
-    def serve_forever(self, host: str, port: int = 80, root_path: str = "") -> None:
+    def serve_forever(self, host: str, port: int = 80) -> None:
         """Wait for HTTP requests at the given host and port. Does not return.
 
         :param str host: host name or IP address
         :param int port: port
-        :param str root: root directory to serve files from
         """
-        self.start(host, port, root_path)
+        self.start(host, port)
 
         while True:
             try:
@@ -87,17 +79,14 @@ class HTTPServer:
             except OSError:
                 continue
 
-    def start(self, host: str, port: int = 80, root_path: str = "") -> None:
+    def start(self, host: str, port: int = 80) -> None:
         """
         Start the HTTP server at the given host and port. Requires calling
         poll() in a while loop to handle incoming requests.
 
         :param str host: host name or IP address
         :param int port: port
-        :param str root: root directory to serve files from
         """
-        self.root_path = root_path
-
         self._sock = self._socket_source.socket(
             self._socket_source.AF_INET, self._socket_source.SOCK_STREAM
         )
@@ -117,6 +106,7 @@ class HTTPServer:
             except OSError as ex:
                 if ex.errno == ETIMEDOUT:
                     break
+                raise
             except Exception as ex:
                 raise ex
         return received_bytes
@@ -135,6 +125,7 @@ class HTTPServer:
             except OSError as ex:
                 if ex.errno == ETIMEDOUT:
                     break
+                raise
             except Exception as ex:
                 raise ex
         return received_body_bytes[:content_length]
@@ -146,7 +137,7 @@ class HTTPServer:
         the application callable will be invoked.
         """
         try:
-            conn, _ = self._sock.accept()
+            conn, client_address = self._sock.accept()
             with conn:
                 conn.settimeout(self._timeout)
 
@@ -157,9 +148,9 @@ class HTTPServer:
                 if not header_bytes:
                     return
 
-                request = HTTPRequest(header_bytes)
+                request = HTTPRequest(conn, client_address, header_bytes)
 
-                content_length = int(request.headers.get("content-length", 0))
+                content_length = int(request.headers.get("Content-Length", 0))
                 received_body_bytes = request.body
 
                 # Receiving remaining body bytes
@@ -167,38 +158,50 @@ class HTTPServer:
                     conn, received_body_bytes, content_length
                 )
 
-                handler = self.route_handlers.get(
-                    _HTTPRoute(request.path, request.method), None
+                # Find a handler for the route
+                handler = self.routes.find_handler(
+                    _HTTPRoute(request.path, request.method)
                 )
 
-                # If a handler for route exists and is callable, call it.
-                if handler is not None and callable(handler):
-                    # Need to pass connection for chunked encoding to work.
-                    try:
-                        response = handler(request, conn)
-                    except TypeError:
-                        response = handler(request)
-                    if response is None:
-                        return
+                try:
+                    # If a handler for route exists and is callable, call it.
+                    if handler is not None and callable(handler):
+                        handler(request)
 
-                # If no handler exists and request method is GET, try to serve a file.
-                elif request.method == HTTPMethod.GET:
-                    response = HTTPResponse(
-                        filename=request.path, root_path=self.root_path, cache=604800
+                    # If no handler exists and request method is GET or HEAD, try to serve a file.
+                    elif handler is None and request.method in (
+                        HTTPMethod.GET,
+                        HTTPMethod.HEAD,
+                    ):
+                        filename = "index.html" if request.path == "/" else request.path
+                        HTTPResponse(request).send_file(
+                            filename=filename,
+                            root_path=self.root_path,
+                            buffer_size=self.request_buffer_size,
+                            head_only=(request.method == HTTPMethod.HEAD),
+                        )
+                    else:
+                        HTTPResponse(
+                            request, status=CommonHTTPStatus.BAD_REQUEST_400
+                        ).send()
+
+                except InvalidPathError as error:
+                    HTTPResponse(request, status=CommonHTTPStatus.FORBIDDEN_403).send(
+                        str(error)
                     )
 
-                # If no handler exists and request method is not GET, return 400 Bad Request.
-                else:
-                    response = HTTPResponse(status=CommonHTTPStatus.BAD_REQUEST_400)
+                except FileNotExistsError as error:
+                    HTTPResponse(request, status=CommonHTTPStatus.NOT_FOUND_404).send(
+                        str(error)
+                    )
 
-                response.send(conn)
-        except OSError as ex:
-            # handle EAGAIN and ECONNRESET
-            if ex.errno == EAGAIN:
-                # there is no data available right now, try again later.
+        except OSError as error:
+            # Handle EAGAIN and ECONNRESET
+            if error.errno == EAGAIN:
+                # There is no data available right now, try again later.
                 return
-            if ex.errno == ECONNRESET:
-                # connection reset by peer, try again later.
+            if error.errno == ECONNRESET:
+                # Connection reset by peer, try again later.
                 return
             raise
 
@@ -213,7 +216,7 @@ class HTTPServer:
 
         Example::
 
-            server = HTTPServer(pool)
+            server = HTTPServer(pool, "/static")
             server.request_buffer_size = 2048
 
             server.serve_forever(str(wifi.radio.ipv4_address))
@@ -228,13 +231,14 @@ class HTTPServer:
     def socket_timeout(self) -> int:
         """
         Timeout after which the socket will stop waiting for more incoming data.
-        When exceeded, raises `OSError` with `errno.ETIMEDOUT`.
 
-        Default timeout is 0, which means socket is in non-blocking mode.
+        Must be set to positive integer or float. Default is 1 second.
+
+        When exceeded, raises `OSError` with `errno.ETIMEDOUT`.
 
         Example::
 
-            server = HTTPServer(pool)
+            server = HTTPServer(pool, "/static")
             server.socket_timeout = 3
 
             server.serve_forever(str(wifi.radio.ipv4_address))
