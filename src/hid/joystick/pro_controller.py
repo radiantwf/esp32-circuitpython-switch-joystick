@@ -239,8 +239,8 @@ class JoyStick_PRO_CONTROLLER(JoyStick):
         release_monotonic_ns = 0
         last_action = ""
         for input_line in inputs:
-            last_action = input_line
-            if input_line == "~":
+            last_action = input_line[0]
+            if input_line[0] == "~":
                 continue
             await self._send(input_line[0],release_monotonic_ns)
             release_monotonic_ns = self._last_key_press_ns + input_line[1]*1000000000
