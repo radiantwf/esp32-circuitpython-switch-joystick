@@ -34,6 +34,9 @@ def main():
                 if i>=5:
                     raise
         print(wifi_connect.ip_address())
+        print(wifi.radio.hostname)
+        import customize.datetime
+        print(customize.datetime.ntpSync())
         if web_running:
             import http_server as http
             tm.create_task(http.serve(), "")

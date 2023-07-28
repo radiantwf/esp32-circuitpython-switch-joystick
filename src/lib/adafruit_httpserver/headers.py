@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 """
-`adafruit_httpserver.headers.HTTPHeaders`
+`adafruit_httpserver.headers`
 ====================================================
 * Author(s): Michał Pokusa
 """
@@ -13,7 +13,7 @@ except ImportError:
     pass
 
 
-class HTTPHeaders:
+class Headers:
     """
     A dict-like class for storing HTTP headers.
 
@@ -23,7 +23,7 @@ class HTTPHeaders:
 
     Examples::
 
-        headers = HTTPHeaders({"Content-Type": "text/html", "Content-Length": "1024"})
+        headers = Headers({"Content-Type": "text/html", "Content-Length": "1024"})
 
         len(headers)
         # 2
@@ -48,7 +48,6 @@ class HTTPHeaders:
     _storage: Dict[str, Tuple[str, str]]
 
     def __init__(self, headers: Dict[str, str] = None) -> None:
-
         headers = headers or {}
 
         self._storage = {key.lower(): [key, value] for key, value in headers.items()}
@@ -81,7 +80,7 @@ class HTTPHeaders:
 
     def copy(self):
         """Returns a copy of the headers."""
-        return HTTPHeaders(dict(self._storage.values()))
+        return Headers(dict(self._storage.values()))
 
     def __getitem__(self, name: str):
         return self._storage[name.lower()][1]

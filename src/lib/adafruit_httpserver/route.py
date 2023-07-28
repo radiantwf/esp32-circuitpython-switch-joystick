@@ -2,35 +2,52 @@
 #
 # SPDX-License-Identifier: MIT
 """
-`adafruit_httpserver.route._HTTPRoute`
+`adafruit_httpserver.route`
 ====================================================
 * Author(s): Dan Halbert, Michał Pokusa
 """
 
 try:
-    from typing import Callable, List, Union, Tuple
+    from typing import Callable, List, Set, Union, Tuple, TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from .response import Response
 except ImportError:
     pass
 
 import re
 
-from .methods import HTTPMethod
+from .methods import GET
 
 
-class _HTTPRoute:
-    """Route definition for different paths, see `adafruit_httpserver.server.HTTPServer.route`."""
+class _Route:
+    """Route definition for different paths, see `adafruit_httpserver.server.Server.route`."""
 
-    def __init__(self, path: str = "", method: HTTPMethod = HTTPMethod.GET) -> None:
+    def __init__(
+        self,
+        path: str = "",
+        methods: Union[str, Set[str]] = GET,
+        append_slash: bool = False,
+    ) -> None:
+        self._validate_path(path)
 
-        contains_parameters = re.search(r"<\w*>", path) is not None
+        self.parameters_names = [
+            name[1:-1] for name in re.compile(r"/[^<>]*/?").split(path) if name != ""
+        ]
+        self.path = re.sub(r"<\w+>", r"([^/]+)", path).replace("....", r".+").replace(
+            "...", r"[^/]+"
+        ) + ("/?" if append_slash else "")
+        self.methods = methods if isinstance(methods, set) else {methods}
 
-        self.path = (
-            path if not contains_parameters else re.sub(r"<\w*>", r"([^/]*)", path)
-        )
-        self.method = method
-        self._contains_parameters = contains_parameters
+    @staticmethod
+    def _validate_path(path: str) -> None:
+        if not path.startswith("/"):
+            raise ValueError("Path must start with a slash.")
 
-    def match(self, other: "_HTTPRoute") -> Tuple[bool, List[str]]:
+        if "<>" in path:
+            raise ValueError("All URL parameters must be named.")
+
+    def match(self, other: "_Route") -> Tuple[bool, List[str]]:
         """
         Checks if the route matches the other route.
 
@@ -42,55 +59,67 @@ class _HTTPRoute:
 
         Examples::
 
-            route = _HTTPRoute("/example", HTTPMethod.GET)
+            route = _Route("/example", GET, True)
 
-            other1 = _HTTPRoute("/example", HTTPMethod.GET)
-            route.matches(other1) # True, []
+            other1a = _Route("/example", GET)
+            other1b = _Route("/example/", GET)
+            route.matches(other1a) # True, []
+            route.matches(other1b) # True, []
 
-            other2 = _HTTPRoute("/other-example", HTTPMethod.GET)
+            other2 = _Route("/other-example", GET)
             route.matches(other2) # False, []
 
             ...
 
-            route = _HTTPRoute("/example/<parameter>", HTTPMethod.GET)
+            route = _Route("/example/<parameter>", GET)
 
-            other1 = _HTTPRoute("/example/123", HTTPMethod.GET)
+            other1 = _Route("/example/123", GET)
             route.matches(other1) # True, ["123"]
 
-            other2 = _HTTPRoute("/other-example", HTTPMethod.GET)
+            other2 = _Route("/other-example", GET)
             route.matches(other2) # False, []
+
+            ...
+
+            route1 = _Route("/example/.../something", GET)
+            other1 = _Route("/example/123/something", GET)
+            route1.matches(other1) # True, []
+
+            route2 = _Route("/example/..../something", GET)
+            other2 = _Route("/example/123/456/something", GET)
+            route2.matches(other2) # True, []
         """
 
-        if self.method != other.method:
+        if not other.methods.issubset(self.methods):
             return False, []
 
-        if not self._contains_parameters:
-            return self.path == other.path, []
-
-        regex_match = re.match(self.path, other.path)
+        regex_match = re.match(f"^{self.path}$", other.path)
         if regex_match is None:
             return False, []
 
         return True, regex_match.groups()
 
     def __repr__(self) -> str:
-        return f"_HTTPRoute(path={repr(self.path)}, method={repr(self.method)})"
+        path = repr(self.path)
+        methods = repr(self.methods)
+
+        return f"_Route(path={path}, methods={methods})"
 
 
-class _HTTPRoutes:
+class _Routes:
     """A collection of routes and their corresponding handlers."""
 
     def __init__(self) -> None:
-        self._routes: List[_HTTPRoute] = []
+        self._routes: List[_Route] = []
         self._handlers: List[Callable] = []
 
-    def add(self, route: _HTTPRoute, handler: Callable):
+    def add(self, route: _Route, handler: Callable):
         """Adds a route and its handler to the collection."""
 
         self._routes.append(route)
         self._handlers.append(handler)
 
-    def find_handler(self, route: _HTTPRoute) -> Union[Callable, None]:
+    def find_handler(self, route: _Route) -> Union[Callable["...", "Response"], None]:
         """
         Finds a handler for a given route.
 
@@ -99,19 +128,16 @@ class _HTTPRoutes:
 
         Example::
 
-            @server.route("/example/<my_parameter>", HTTPMethod.GET)
+            @server.route("/example/<my_parameter>", GET)
             def route_func(request, my_parameter):
                 ...
                 request.path == "/example/123" # True
                 my_parameter == "123" # True
         """
-        if not self._routes:
-            return None
-
         found_route, _route = False, None
 
         for _route in self._routes:
-            matches, url_parameters_values = _route.match(route)
+            matches, parameters_values = _route.match(route)
 
             if matches:
                 found_route = True
@@ -122,10 +148,12 @@ class _HTTPRoutes:
 
         handler = self._handlers[self._routes.index(_route)]
 
+        keyword_parameters = dict(zip(_route.parameters_names, parameters_values))
+
         def wrapped_handler(request):
-            return handler(request, *url_parameters_values)
+            return handler(request, **keyword_parameters)
 
         return wrapped_handler
 
     def __repr__(self) -> str:
-        return f"_HTTPRoutes({repr(self._routes)})"
+        return f"_Routes({repr(self._routes)})"

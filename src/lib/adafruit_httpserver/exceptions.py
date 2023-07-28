@@ -8,6 +8,18 @@
 """
 
 
+class ServerStoppedError(Exception):
+    """
+    Raised when ``.poll`` is called on a stopped ``Server``.
+    """
+
+
+class AuthenticationError(Exception):
+    """
+    Raised by ``require_authentication`` when the ``Request`` is not authorized.
+    """
+
+
 class InvalidPathError(Exception):
     """
     Parent class for all path related errors.
@@ -34,9 +46,9 @@ class BackslashInPathError(InvalidPathError):
         super().__init__(f"Backslash in path: {path}")
 
 
-class ResponseAlreadySentError(Exception):
+class ServingFilesDisabledError(Exception):
     """
-    Another ``HTTPResponse`` has already been sent. There can only be one per ``HTTPRequest``.
+    Raised when ``root_path`` is not set and there is no handler for ``request``.
     """
 
 

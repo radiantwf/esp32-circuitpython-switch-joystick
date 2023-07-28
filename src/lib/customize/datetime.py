@@ -14,7 +14,7 @@ def ntpSync():
         import rtc
         import adafruit_ntp
         ntp = adafruit_ntp.NTP(socketpool.SocketPool(
-            wifi.radio), server='0.cn.pool.ntp.org', port=123, tz_offset=8)
+            wifi.radio), server='1.cn.pool.ntp.org', tz_offset=8)
         rtc.RTC().datetime = ntp.datetime
     except:
         pass

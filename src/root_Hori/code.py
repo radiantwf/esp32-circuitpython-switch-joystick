@@ -8,6 +8,7 @@ import macros
 import time
 import customize.task_manager as task_manager
 import customize.config as config
+import customize.datetime
 
 def main():
     c = config.Config()
@@ -34,6 +35,8 @@ def main():
                 if i>=5:
                     raise
         print(wifi_connect.ip_address())
+        print(wifi.radio.hostname)
+        print(customize.datetime.ntpSync())
         if web_running:
             import http_server as http
             tm.create_task(http.serve(), "")
