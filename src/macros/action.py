@@ -93,7 +93,16 @@ class Action(object):
         else:
             self._current = self._current.next
             self._return_jump()
+        if line:
+            var_strs = self.extract_action_variable_str(line)
+            for var_str in var_strs:
+                line = line.replace("-*" + var_str + "*-", str(self._paras.get_float(var_str)))
         return line, is_finish
+
+    def extract_action_variable_str(self, text):
+        parts = text.split('-*')
+        result = [part.split('*-')[0] for part in parts if '*-' in part]
+        return result
 
     def reset(self):
         self._current = self._head
