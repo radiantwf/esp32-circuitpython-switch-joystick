@@ -59,14 +59,9 @@ class Action(object):
     def pop(self):
         line: str = None
         is_finish = False
-        # 修复：遇到子脚本结束标记时先尝试弹栈返回父脚本
-        if self._current == None:
-            return None, True
-        if self._current.action == macro._FINISHED_LINE:
-            self._return_jump()
-            if self._current.action == macro._FINISHED_LINE:
-                return None, True
         while True:
+            if self._current == None:
+                return None, True
             while self._jump_node():
                 pass
             line = self._current.action
@@ -90,13 +85,12 @@ class Action(object):
                     return None, True
                 line = self._current.action
                 continue
+            elif self._current.action == macro._FINISHED_LINE:
+                self._return_jump()
+                if self._current.action == macro._FINISHED_LINE:
+                    return None, True
             else:
                 break
-        if self._current.action == macro._FINISHED_LINE:
-            self._return_jump()
-            if self._current.action == macro._FINISHED_LINE:
-                return None, True
-
         self._current = self._current.next
         self._return_jump()
         if line:
